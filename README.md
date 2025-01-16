@@ -11,7 +11,7 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🚫 Excludes unwanted paths from scraping
 - 🔄 Handles relative and absolute URLs like a pro
 - 🎯 No duplicate page visits
-- 📊 Generates JSONL output file for ML training
+- 📊 Generates JSONL and raw text output file for ML training
 - 📊 AI-friendly clean text output (perfect for LLM fine-tuning!)
 
 ## 🛠️ Prerequisites
@@ -43,11 +43,12 @@ npm install
 const WebScraper = require('clean-web-scraper');
 
 const scraper = new WebScraper({
-  baseURL: 'https://example.com',      // Required: The website to scrape
-  folderPath: './output',              // Required: Where to save the content
-  excludeList: ['/admin', '/private'], // Optional: Paths to exclude
-  exactExcludeList: ['/specific-page'],// Optional: Exact URLs to exclude
-  jsonlPath: 'output.jsonl'            // Optional: Custom JSONL output path
+  baseURL: 'https://example.com',       // Required: The website to scrape
+  scrapResultPath: './output',          // Required: Where to save the content
+  excludeList: ['/admin', '/private'],  // Optional: Paths to exclude
+  exactExcludeList: ['/specific-page'], // Optional: Exact URLs to exclude
+  jsonlPath: 'output.jsonl',            // Optional: Custom JSONL output path
+  textOutputPath: "./dataset/texts"     // Optional: Custom text output path
 });
 
 scraper.start();

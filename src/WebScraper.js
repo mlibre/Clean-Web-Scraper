@@ -7,11 +7,19 @@ const path = require( "path" );
 
 class WebScraper
 {
-	constructor ({ baseURL, folderPath, excludeList, exactExcludeList, jsonlPath })
+	constructor ({
+		baseURL,
+		excludeList,
+		exactExcludeList,
+		scrapResultPath = "./dataset",
+		jsonlPath,
+		textOutputPath
+	})
 	{
 		this.baseURL = baseURL;
-		this.jsonlPath = jsonlPath || "output.jsonl";
-		this.folderPath = path.join( folderPath, baseURL.replace( /^(https?:\/\/)?(www\.)?/, "" ).replace( /\/$/, "" ) );
+		this.scrapResultPath = path.join( scrapResultPath, baseURL.replace( /^(https?:\/\/)?(www\.)?/, "" ).replace( /\/$/, "" ) );
+		this.jsonlPath = jsonlPath || path.join( this.scrapResultPath, "train.jsonl" );
+		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
 		this.visited = new Set();
 		this.excludeList = new Set( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
@@ -24,6 +32,8 @@ class WebScraper
 		this.visited.add( this.baseURL );
 		await this.fetchPage( this.baseURL );
 		this.createJSONLFile();
+		this.saveNumberedTextFiles();
+		console.log( "Scraping completed." );
 	}
 
 	async fetchPage ( url )
@@ -104,7 +114,7 @@ class WebScraper
 		{
 			urlPath = "/index";
 		}
-		const filePath = path.join( __dirname, this.folderPath, urlPath );
+		const filePath = path.join( __dirname, this.scrapResultPath, urlPath );
 		const dir = path.dirname( filePath );
 
 		// Create metadata object
@@ -140,6 +150,17 @@ class WebScraper
 
 		writeStream.end();
 		console.log( `Created JSONL file at: ${this.jsonlPath}` );
+	}
+
+	saveNumberedTextFiles ()
+	{
+		this.processedContent.forEach( ( content, index ) =>
+		{
+			const fileName = `${index + 1}.txt`;
+			const filePath = path.join( __dirname, this.textOutputPath, fileName );
+			fs.writeFileSync( filePath, content.text, "utf-8" );
+			console.log( `Created numbered text file: ${fileName}` );
+		});
 	}
 
 	processContent ( content )
@@ -194,14 +215,12 @@ class WebScraper
 
 	createOutputDirectory ()
 	{
-		if ( fs.existsSync( path.join( __dirname, this.folderPath ) ) )
+		if ( fs.existsSync( path.join( __dirname, this.scrapResultPath ) ) )
 		{
-			fs.rmSync( path.join( __dirname, this.folderPath ), { recursive: true, force: true });
+			fs.rmSync( path.join( __dirname, this.scrapResultPath ), { recursive: true, force: true });
 		}
-		if ( !fs.existsSync( path.join( __dirname, this.folderPath ) ) )
-		{
-			fs.mkdirSync( path.join( __dirname, this.folderPath ), { recursive: true });
-		}
+		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
+		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
 }
 

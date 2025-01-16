@@ -1,7 +1,8 @@
 const WebScraper = require( "./src/WebScraper" );
 
+// Configuration
 const baseURL = "https://decolonizepalestine.com";
-const folderPath = "./dataset";
+const scrapResultPath = "./dataset";
 const excludeList = [
 	"https://decolonizepalestine.com/cdn-cgi",
 	"https://decolonizepalestine.com/introduction-to-palestine",
@@ -14,12 +15,13 @@ const exactExcludeList = [
 	"https://decolonizepalestine.com/"
 ]
 
-
+// Initialize scraper with all available options
 const scraper = new WebScraper({
 	baseURL,
-	folderPath,
+	scrapResultPath,
 	excludeList,
 	exactExcludeList,
-	jsonlPath: "./dataset/final.jsonl"
+	jsonlPath: "./dataset/train.jsonl",
+	textOutputPath: "./dataset/texts"
 });
 scraper.start();
