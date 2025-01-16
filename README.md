@@ -11,7 +11,7 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🚫 Excludes unwanted paths from scraping
 - 🔄 Handles relative and absolute URLs like a pro
 - 🎯 No duplicate page visits
-- 📊 Generates JSONL and raw text output file for ML training
+- 📊 Generates JSONL output file for ML training
 - 📊 AI-friendly clean text output (perfect for LLM fine-tuning!)
 
 ## 🛠️ Prerequisites
