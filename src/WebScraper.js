@@ -13,13 +13,15 @@ class WebScraper
 		exactExcludeList,
 		scrapResultPath = "./dataset",
 		jsonlPath,
-		textOutputPath
+		textOutputPath,
+		csvPath
 	})
 	{
 		this.baseURL = baseURL;
 		this.scrapResultPath = path.join( scrapResultPath, baseURL.replace( /^(https?:\/\/)?(www\.)?/, "" ).replace( /\/$/, "" ) );
 		this.jsonlPath = jsonlPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
+		this.csvPath = csvPath || path.join( this.scrapResultPath, "train.csv" );
 		this.visited = new Set();
 		this.excludeList = new Set( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
@@ -33,6 +35,7 @@ class WebScraper
 		await this.fetchPage( this.baseURL );
 		this.createJSONLFile();
 		this.saveNumberedTextFiles();
+		this.createCSVFile();
 		console.log( "Scraping completed." );
 	}
 
@@ -150,6 +153,23 @@ class WebScraper
 
 		writeStream.end();
 		console.log( `Created JSONL file at: ${this.jsonlPath}` );
+	}
+
+	createCSVFile ()
+	{
+		const writeStream = fs.createWriteStream( path.join( __dirname, this.csvPath ) );
+
+		writeStream.write( "text\n" );
+
+		for ( const content of this.processedContent )
+		{
+			const escapedText = content.text.replace( /"/g, "\"\"" );
+			const csvLine = `"${escapedText}"\n`;
+			writeStream.write( csvLine );
+		}
+
+		writeStream.end();
+		console.log( `Created CSV file at: ${this.csvPath}` );
 	}
 
 	saveNumberedTextFiles ()

@@ -22,6 +22,7 @@ const scraper = new WebScraper({
 	excludeList,
 	exactExcludeList,
 	jsonlPath: "./dataset/train.jsonl",
-	textOutputPath: "./dataset/texts"
+	textOutputPath: "./dataset/texts",
+	csvPath: "./dataset/train.csv"
 });
 scraper.start();

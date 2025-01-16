@@ -12,7 +12,7 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🔄 Handles relative and absolute URLs like a pro
 - 🎯 No duplicate page visits
 - 📊 Generates JSONL output file for ML training
-- 📊 AI-friendly clean text output (perfect for LLM fine-tuning!)
+- 📊 AI-friendly clean text and csv output (perfect for LLM fine-tuning!)
 
 ## 🛠️ Prerequisites
 
@@ -48,7 +48,8 @@ const scraper = new WebScraper({
   excludeList: ['/admin', '/private'],  // Optional: Paths to exclude
   exactExcludeList: ['/specific-page'], // Optional: Exact URLs to exclude
   jsonlPath: 'output.jsonl',            // Optional: Custom JSONL output path
-  textOutputPath: "./dataset/texts"     // Optional: Custom text output path
+  textOutputPath: "./dataset/texts",    // Optional: Custom text output path
+  csvPath: "./dataset/train.csv"        // Optional: Custom CSV output path
 });
 
 scraper.start();
@@ -67,6 +68,7 @@ Your AI-ready content is saved in a clean, structured format:
 - 📝 Pure text format, perfect for LLM training and fine-tuning
 - 🤖 No HTML, no mess - just clean, structured text ready for AI consumption
 - 📊 JSONL output for ML training
+- 📈 CSV output with clean text content
 
 ## 🤖 AI/LLM Training Ready
 
