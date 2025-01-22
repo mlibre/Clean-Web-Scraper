@@ -44,10 +44,10 @@ const WebScraper = require('clean-web-scraper');
 
 const scraper = new WebScraper({
   baseURL: 'https://example.com',       // Required: The website to scrape
-  scrapResultPath: './output',          // Required: Where to save the content
   excludeList: ['/admin', '/private'],  // Optional: Paths to exclude
   exactExcludeList: ['/specific-page'], // Optional: Exact URLs to exclude
-  jsonlPath: 'output.jsonl',            // Optional: Custom JSONL output path
+  scrapResultPath: './dataset',         // Required: Where to save the content
+  jsonlPath: './dataset/train.jsonl',   // Optional: Custom JSONL output path
   textOutputPath: "./dataset/texts",    // Optional: Custom text output path
   csvPath: "./dataset/train.csv"        // Optional: Custom CSV output path
 });
@@ -69,6 +69,30 @@ Your AI-ready content is saved in a clean, structured format:
 - 🤖 No HTML, no mess - just clean, structured text ready for AI consumption
 - 📊 JSONL output for ML training
 - 📈 CSV output with clean text content
+
+```bash
+dataset/
+├── decolonizepalestine.com
+│   ├── faq.json
+│   ├── faq.txt
+│   ├── intro
+│   │   ├── bds-101.json
+│   │   ├── bds-101.txt
+│   ├── myth
+│   │   ├── a-land-without-a-people-for-a-people-without-a-land.json
+│   │   ├── a-land-without-a-people-for-a-people-without-a-land.txt
+│   └── rainbow-washing
+│       ├── bluewashing.json
+│       ├── bluewashing.txt
+├── texts
+│   ├── 1.txt
+│   ├── 2.txt
+│   ├── 3.txt
+│   ├── 4.txt
+│   └── 5.txt
+├── train.csv
+└── train.jsonl
+```
 
 ## 🤖 AI/LLM Training Ready
 
