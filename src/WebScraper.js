@@ -20,7 +20,7 @@ class WebScraper
 	{
 		this.baseURL = baseURL;
 		this.startURL = startURL || baseURL;
-		this.scrapResultPath = path.join( scrapResultPath, baseURL.replace( /^(https?:\/\/)?(www\.)?/, "" ).replace( /\/$/, "" ) );
+		this.scrapResultPath = scrapResultPath;
 		this.jsonlPath = jsonlPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
 		this.csvPath = csvPath || path.join( this.scrapResultPath, "train.csv" );

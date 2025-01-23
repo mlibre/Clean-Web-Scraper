@@ -13,7 +13,7 @@ async function khameneiIrFreePalestineTag ()
 		],
 		exactExcludeList: [
 		],
-		scrapResultPath: "./dataset/khamenei-ir-free-palestine-tag",
+		scrapResultPath: "./dataset/khamenei-ir-free-palestine-tag/website",
 		jsonlPath: "./dataset/khamenei-ir-free-palestine-tag/train.jsonl",
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv"
@@ -39,7 +39,7 @@ async function decolonizepalestine ()
 			"https://decolonizepalestine.com/rainbow-washing",
 			"https://decolonizepalestine.com/"
 		],
-		scrapResultPath: "./dataset/decolonizepalestine",
+		scrapResultPath: "./dataset/decolonizepalestine/website",
 		jsonlPath: "./dataset/decolonizepalestine/train.jsonl",
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvPath: "./dataset/decolonizepalestine/train.csv"
@@ -49,8 +49,8 @@ async function decolonizepalestine ()
 
 void async function main ()
 {
-	await khameneiIrFreePalestineTag();
-	// await decolonizepalestine();
+	// await khameneiIrFreePalestineTag();
+	await decolonizepalestine();
 
 
 	// 3

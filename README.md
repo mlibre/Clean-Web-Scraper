@@ -44,14 +44,14 @@ npm install
 const WebScraper = require('clean-web-scraper');
 
 const scraper = new WebScraper({
-  baseURL: 'https://example.com',       // Required: The website to scrape
-  startURL: 'https://example.com/blog', // Optional: Custom starting URL
-  excludeList: ['/admin', '/private'],  // Optional: Paths to exclude
-  exactExcludeList: ['/specific-page'], // Optional: Exact URLs to exclude
-  scrapResultPath: './dataset',         // Required: Where to save the content
-  jsonlPath: './dataset/train.jsonl',   // Optional: Custom JSONL output path
-  textOutputPath: "./dataset/texts",    // Optional: Custom text output path
-  csvPath: "./dataset/train.csv"        // Optional: Custom CSV output path
+  baseURL: 'https://example.com',           // Required: The website to scrape
+  startURL: 'https://example.com/blog',     // Optional: Custom starting URL
+  excludeList: ['/admin', '/private'],      // Optional: Paths to exclude
+  exactExcludeList: ['/specific-page'],     // Optional: Exact URLs to exclude
+  scrapResultPath: './example.com/website', // Required: Where to save the content
+  jsonlPath: './example.com/train.jsonl',   // Optional: Custom JSONL output path
+  textOutputPath: "./example.com/texts",    // Optional: Custom text output path
+  csvPath: "./example.com/train.csv"        // Optional: Custom CSV output path
 });
 
 scraper.start();
@@ -73,18 +73,18 @@ Your AI-ready content is saved in a clean, structured format:
 - 📈 CSV output with clean text content
 
 ```bash
-dataset/
-├── example.com/
+example.com/
+├── website/
 │   ├── page1.txt         # Clean text content
 │   ├── page1.json        # Full metadata
-│   ├── blog/
-│   │   ├── post1.txt
-│   │   ├── post1.json
-│   ├── texts/           # Numbered text files
-│   │   ├── 1.txt
-│   │   ├── 2.txt
-│   ├── train.jsonl      # Combined content
-│   └── train.csv        # Clean text in CSV format
+│   └── blog/
+│       ├── post1.txt
+│       └── post1.json
+│── texts/           # Numbered text files
+│       ├── 1.txt
+│       ├── 2.txt
+│── train.jsonl      # Combined content
+└── train.csv        # Clean text in CSV format
 ```
 
 ## 🤖 AI/LLM Training Ready
