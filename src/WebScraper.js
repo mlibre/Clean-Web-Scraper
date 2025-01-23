@@ -31,7 +31,6 @@ class WebScraper
 
 	async start ()
 	{
-		this.visited.add( this.baseURL );
 		await this.fetchPage( this.baseURL );
 		this.createJSONLFile();
 		this.saveNumberedTextFiles();
@@ -41,6 +40,7 @@ class WebScraper
 
 	async fetchPage ( url )
 	{
+		this.visited.add( url );
 		try
 		{
 			const { data } = await axios.get( url );
@@ -67,7 +67,6 @@ class WebScraper
 			{
 				if ( !this.visited.has( link ) )
 				{
-					this.visited.add( link );
 					await this.fetchPage( link );
 				}
 			}
