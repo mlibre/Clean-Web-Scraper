@@ -44,7 +44,7 @@ npm install
 const WebScraper = require('clean-web-scraper');
 
 const scraper = new WebScraper({
-  baseURL: 'https://example.com/news',           // Required: The website to scrape
+  baseURL: 'https://example.com/news',      // Required: The website base url to scrape
   startURL: 'https://example.com/blog',     // Optional: Custom starting URL
   excludeList: ['/admin', '/private'],      // Optional: Paths to exclude
   exactExcludeList: ['/specific-page'],     // Optional: Exact URLs to exclude
