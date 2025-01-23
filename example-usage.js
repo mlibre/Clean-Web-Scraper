@@ -9,19 +9,21 @@ async function khameneiIrFreePalestineTag ()
 	const scraper = new WebScraper({
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
+		maxDepth: 1,
 		excludeList: [
 		],
 		exactExcludeList: [
+			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#"
 		],
 		scrapResultPath: "./dataset/khamenei-ir-free-palestine-tag/website",
-		jsonlPath: "./dataset/khamenei-ir-free-palestine-tag/train.jsonl",
+		jsonlOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.jsonl",
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
-		csvPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv"
+		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
+		includeTitles: true
 	});
 	await scraper.start();
 }
 
-// decolonizepalestine
 async function decolonizepalestine ()
 {
 	// 2
@@ -40,16 +42,16 @@ async function decolonizepalestine ()
 			"https://decolonizepalestine.com/"
 		],
 		scrapResultPath: "./dataset/decolonizepalestine/website",
-		jsonlPath: "./dataset/decolonizepalestine/train.jsonl",
+		jsonlOutputPath: "./dataset/decolonizepalestine/train.jsonl",
 		textOutputPath: "./dataset/decolonizepalestine/texts",
-		csvPath: "./dataset/decolonizepalestine/train.csv"
+		csvOutputPath: "./dataset/decolonizepalestine/train.csv"
 	});
 	await scraper.start();
 }
 
 void async function main ()
 {
-	// await khameneiIrFreePalestineTag();
+	await khameneiIrFreePalestineTag();
 	await decolonizepalestine();
 
 

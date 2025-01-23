@@ -10,38 +10,46 @@ class WebScraper
 	constructor ({
 		baseURL,
 		startURL,
+		maxDepth = Infinity,
 		excludeList,
 		exactExcludeList,
 		scrapResultPath = "./dataset",
-		jsonlPath,
+		jsonlOutputPath,
 		textOutputPath,
-		csvPath
+		csvOutputPath,
+		includeTitles = false
 	})
 	{
 		this.baseURL = baseURL;
 		this.startURL = startURL || baseURL;
+		this.maxDepth = maxDepth;
 		this.scrapResultPath = scrapResultPath;
-		this.jsonlPath = jsonlPath || path.join( this.scrapResultPath, "train.jsonl" );
+		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
-		this.csvPath = csvPath || path.join( this.scrapResultPath, "train.csv" );
+		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
+		this.includeTitles = includeTitles;
 		this.visited = new Set();
 		this.excludeList = new Set( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
-		this.allProcessedContent = []; // Add this line
+		this.allProcessedContent = [];
 		this.createOutputDirectory();
 	}
 
 	async start ()
 	{
-		await this.fetchPage( this.startURL );
+		await this.fetchPage( this.startURL, 0 );
 		this.createJSONLFile();
 		this.saveNumberedTextFiles();
 		this.createCSVFile();
 		console.log( "Scraping completed." );
 	}
 
-	async fetchPage ( url )
+	async fetchPage ( url, depth )
 	{
+		if ( depth > this.maxDepth )
+		{
+			return;
+		}
 		this.visited.add( url );
 		try
 		{
@@ -57,6 +65,7 @@ class WebScraper
 				if ( article )
 				{
 					const metadata = this.metadataextractor( url, document, headers );
+					metadata.depth = depth;
 					this.saveArticle( url, article.textContent, metadata );
 				}
 				else
@@ -70,7 +79,7 @@ class WebScraper
 			{
 				if ( !this.visited.has( link ) )
 				{
-					await this.fetchPage( link );
+					await this.fetchPage( link, depth + 1 );
 				}
 			}
 		}
@@ -122,23 +131,16 @@ class WebScraper
 		const filePath = path.join( __dirname, this.scrapResultPath, urlPath );
 		const dir = path.dirname( filePath );
 
-		// Create directory if it doesn't exist
 		fs.mkdirSync( dir, { recursive: true });
-
-		// Save the text content
 		fs.writeFileSync( `${filePath}.txt`, processedContent, "utf-8" );
-
-		// Save the JSON metadata
 		fs.writeFileSync( `${filePath}.json`, JSON.stringify( metadata, null, 2 ), "utf-8" );
-
 		console.log( `Saved: ${filePath}.txt` );
 		console.log( `Saved: ${filePath}.json` );
 	}
 
 	createJSONLFile ()
 	{
-		const writeStream = fs.createWriteStream( path.join( __dirname, this.jsonlPath ) );
-
+		const writeStream = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPath ) );
 		for ( const content of this.allProcessedContent )
 		{
 			const jsonLine = `${JSON.stringify( content )}\n`;
@@ -146,24 +148,27 @@ class WebScraper
 		}
 
 		writeStream.end();
-		console.log( `Created JSONL file at: ${this.jsonlPath}` );
+		console.log( `Created JSONL file at: ${this.jsonlOutputPath}` );
 	}
 
 	createCSVFile ()
 	{
-		const writeStream = fs.createWriteStream( path.join( __dirname, this.csvPath ) );
-
+		const writeStream = fs.createWriteStream( path.join( __dirname, this.csvOutputPath ) );
 		writeStream.write( "text\n" );
-
 		for ( const content of this.allProcessedContent )
 		{
-			const escapedText = content.text.replace( /"/g, "\"\"" );
+			let fullText = content.text;
+			if ( this.includeTitles && content.metadata.title )
+			{
+				fullText = `Title: ${content.metadata.title}\n\n${content.text}`;
+			}
+			const escapedText = fullText.replace( /"/g, "\"\"" );
 			const csvLine = `"${escapedText}"\n`;
 			writeStream.write( csvLine );
 		}
 
 		writeStream.end();
-		console.log( `Created CSV file at: ${this.csvPath}` );
+		console.log( `Created CSV file at: ${this.csvOutputPath}` );
 	}
 
 	saveNumberedTextFiles ()
@@ -172,7 +177,12 @@ class WebScraper
 		{
 			const fileName = `${index + 1}.txt`;
 			const filePath = path.join( __dirname, this.textOutputPath, fileName );
-			fs.writeFileSync( filePath, content.text, "utf-8" );
+			let titlePrefix = "";
+			if ( this.includeTitles && content.metadata.title )
+			{
+				titlePrefix = `Title: ${content.metadata.title}\n\n`;
+			}
+			fs.writeFileSync( filePath, titlePrefix + content.text, "utf-8" );
 			console.log( `Created numbered text file: ${fileName}` );
 		});
 	}

@@ -44,14 +44,16 @@ npm install
 const WebScraper = require('clean-web-scraper');
 
 const scraper = new WebScraper({
-  baseURL: 'https://example.com/news',      // Required: The website base url to scrape
-  startURL: 'https://example.com/blog',     // Optional: Custom starting URL
-  excludeList: ['/admin', '/private'],      // Optional: Paths to exclude
-  exactExcludeList: ['/specific-page'],     // Optional: Exact URLs to exclude
-  scrapResultPath: './example.com/website', // Required: Where to save the content
-  jsonlPath: './example.com/train.jsonl',   // Optional: Custom JSONL output path
-  textOutputPath: "./example.com/texts",    // Optional: Custom text output path
-  csvPath: "./example.com/train.csv"        // Optional: Custom CSV output path
+  baseURL: 'https://example.com/news',          // Required: The website base url to scrape
+  startURL: 'https://example.com/blog',         // Optional: Custom starting URL
+  excludeList: ['/admin', '/private'],          // Optional: Paths to exclude
+  exactExcludeList: ['/specific-page'],         // Optional: Exact URLs to exclude
+  scrapResultPath: './example.com/website',     // Required: Where to save the content
+  jsonlOutputPath: './example.com/train.jsonl', // Optional: Custom JSONL output path
+  textOutputPath: "./example.com/texts",        // Optional: Custom text output path
+  csvOutputPath: "./example.com/train.csv"      // Optional: Custom CSV output path
+  maxDepth: 3,                                  // Optional: Maximum depth for recursive crawling
+  includeTitles: true,                          // Optional: Include page titles in outputs
 });
 
 scraper.start();
@@ -92,7 +94,7 @@ example.com/
 The output is specifically formatted for AI training purposes:
 
 - Clean, processed text without HTML markup
-- Consistent formatting across all documents
+- Multiple formats (JSONL, CSV, text files)
 - Structured content perfect for fine-tuning LLMs
 - Ready to use in your ML pipelines
 
