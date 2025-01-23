@@ -9,6 +9,7 @@ class WebScraper
 {
 	constructor ({
 		baseURL,
+		startURL,
 		excludeList,
 		exactExcludeList,
 		scrapResultPath = "./dataset",
@@ -18,6 +19,7 @@ class WebScraper
 	})
 	{
 		this.baseURL = baseURL;
+		this.startURL = startURL || baseURL;
 		this.scrapResultPath = path.join( scrapResultPath, baseURL.replace( /^(https?:\/\/)?(www\.)?/, "" ).replace( /\/$/, "" ) );
 		this.jsonlPath = jsonlPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
@@ -25,13 +27,13 @@ class WebScraper
 		this.visited = new Set();
 		this.excludeList = new Set( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
-		this.processedContent = []; // Add this line
+		this.allProcessedContent = []; // Add this line
 		this.createOutputDirectory();
 	}
 
 	async start ()
 	{
-		await this.fetchPage( this.baseURL );
+		await this.fetchPage( this.startURL );
 		this.createJSONLFile();
 		this.saveNumberedTextFiles();
 		this.createCSVFile();
@@ -43,18 +45,19 @@ class WebScraper
 		this.visited.add( url );
 		try
 		{
-			const { data } = await axios.get( url );
+			const { data, headers } = await axios.get( url );
 			const dom = new JSDOM( data, { url });
+			const { document } = dom.window;
 
-			// Only save if the URL is not excluded
 			if ( !this.isExcluded( url ) )
 			{
-				const reader = new Readability( dom.window.document, { charThreshold: 500, nbTopCandidates: 20 });
+				const reader = new Readability( document, { charThreshold: 500, nbTopCandidates: 20 });
 				const article = reader.parse();
 
 				if ( article )
 				{
-					this.saveArticle( url, article.textContent );
+					const metadata = this.metadataextractor( url, document, headers );
+					this.saveArticle( url, article.textContent, metadata );
 				}
 				else
 				{
@@ -86,6 +89,10 @@ class WebScraper
 		while ( ( match = regex.exec( data ) ) !== null )
 		{
 			let href = match[2];
+			if ( href.startsWith( "/" ) )
+			{
+				href = new URL( href, this.baseURL ).href
+			}
 			if ( href.endsWith( "/" ) )
 			{
 				href = href.slice( 0, -1 );
@@ -94,21 +101,17 @@ class WebScraper
 			{
 				links.add( href );
 			}
-			else if ( href.startsWith( "/" ) )
-			{
-				links.add( new URL( href, this.baseURL ).href );
-			}
 		}
-
 		return links;
 	}
 
-	saveArticle ( url, content )
+	saveArticle ( url, content, metadata )
 	{
 		const processedContent = this.processContent( content );
 
-		this.processedContent.push({
-			text: processedContent.trim()
+		this.allProcessedContent.push({
+			text: processedContent.trim(),
+			metadata
 		});
 
 		let urlPath = new URL( url ).pathname;
@@ -118,14 +121,6 @@ class WebScraper
 		}
 		const filePath = path.join( __dirname, this.scrapResultPath, urlPath );
 		const dir = path.dirname( filePath );
-
-		// Create metadata object
-		const metadata = {
-			url,
-			dateScraped: new Date().toISOString(),
-			contentLength: processedContent.length,
-			fileName: `${path.basename( filePath )}.txt`
-		};
 
 		// Create directory if it doesn't exist
 		fs.mkdirSync( dir, { recursive: true });
@@ -144,7 +139,7 @@ class WebScraper
 	{
 		const writeStream = fs.createWriteStream( path.join( __dirname, this.jsonlPath ) );
 
-		for ( const content of this.processedContent )
+		for ( const content of this.allProcessedContent )
 		{
 			const jsonLine = `${JSON.stringify( content )}\n`;
 			writeStream.write( jsonLine );
@@ -160,7 +155,7 @@ class WebScraper
 
 		writeStream.write( "text\n" );
 
-		for ( const content of this.processedContent )
+		for ( const content of this.allProcessedContent )
 		{
 			const escapedText = content.text.replace( /"/g, "\"\"" );
 			const csvLine = `"${escapedText}"\n`;
@@ -173,7 +168,7 @@ class WebScraper
 
 	saveNumberedTextFiles ()
 	{
-		this.processedContent.forEach( ( content, index ) =>
+		this.allProcessedContent.forEach( ( content, index ) =>
 		{
 			const fileName = `${index + 1}.txt`;
 			const filePath = path.join( __dirname, this.textOutputPath, fileName );
@@ -202,6 +197,29 @@ class WebScraper
 		// processed = processed.replace(/\(.*?\)/g, ''); // Removes all content within parentheses
 
 		return processed;
+	}
+
+	metadataextractor ( url, document, headers )
+	{
+		return {
+			url,
+			title: document.title,
+			description: document.querySelector( "meta[name=\"description\"]" )?.content,
+			keywords: document.querySelector( "meta[name=\"keywords\"]" )?.content,
+			author: document.querySelector( "meta[name=\"author\"]" )?.content,
+			lastModified: headers["last-modified"],
+			contentType: headers["content-type"],
+			contentLength: headers["content-length"],
+			language: document.documentElement.lang || document.querySelector( "html" )?.getAttribute( "lang" ),
+			canonicalUrl: document.querySelector( "link[rel=\"canonical\"]" )?.href,
+			ogTags: {
+				title: document.querySelector( "meta[property=\"og:title\"]" )?.content,
+				description: document.querySelector( "meta[property=\"og:description\"]" )?.content,
+				image: document.querySelector( "meta[property=\"og:image\"]" )?.content,
+				type: document.querySelector( "meta[property=\"og:type\"]" )?.content
+			},
+			dateScraped: new Date().toISOString()
+		};
 	}
 
 	normalizeExcludeList ( list )

@@ -13,6 +13,7 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🎯 No duplicate page visits
 - 📊 Generates JSONL output file for ML training
 - 📊 AI-friendly clean text and csv output (perfect for LLM fine-tuning!)
+- 📊 Rich metadata extraction including:
 
 ## 🛠️ Prerequisites
 
@@ -44,6 +45,7 @@ const WebScraper = require('clean-web-scraper');
 
 const scraper = new WebScraper({
   baseURL: 'https://example.com',       // Required: The website to scrape
+  startURL: 'https://example.com/blog', // Optional: Custom starting URL
   excludeList: ['/admin', '/private'],  // Optional: Paths to exclude
   exactExcludeList: ['/specific-page'], // Optional: Exact URLs to exclude
   scrapResultPath: './dataset',         // Required: Where to save the content
@@ -72,26 +74,17 @@ Your AI-ready content is saved in a clean, structured format:
 
 ```bash
 dataset/
-├── decolonizepalestine.com
-│   ├── faq.json
-│   ├── faq.txt
-│   ├── intro
-│   │   ├── bds-101.json
-│   │   ├── bds-101.txt
-│   ├── myth
-│   │   ├── a-land-without-a-people-for-a-people-without-a-land.json
-│   │   ├── a-land-without-a-people-for-a-people-without-a-land.txt
-│   └── rainbow-washing
-│       ├── bluewashing.json
-│       ├── bluewashing.txt
-├── texts
-│   ├── 1.txt
-│   ├── 2.txt
-│   ├── 3.txt
-│   ├── 4.txt
-│   └── 5.txt
-├── train.csv
-└── train.jsonl
+├── example.com/
+│   ├── page1.txt         # Clean text content
+│   ├── page1.json        # Full metadata
+│   ├── blog/
+│   │   ├── post1.txt
+│   │   ├── post1.json
+│   ├── texts/           # Numbered text files
+│   │   ├── 1.txt
+│   │   ├── 2.txt
+│   ├── train.jsonl      # Combined content
+│   └── train.csv        # Clean text in CSV format
 ```
 
 ## 🤖 AI/LLM Training Ready

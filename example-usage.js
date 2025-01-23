@@ -7,12 +7,13 @@ async function khameneiIrFreePalestineTag ()
 	// https://english.khamenei.ir/Opinions/FreePalestine
 	// https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#
 	const scraper = new WebScraper({
-		baseURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
-		scrapResultPath: "./dataset/khamenei-ir-free-palestine-tag",
+		baseURL: "https://english.khamenei.ir/news",
+		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 		excludeList: [
 		],
 		exactExcludeList: [
 		],
+		scrapResultPath: "./dataset/khamenei-ir-free-palestine-tag",
 		jsonlPath: "./dataset/khamenei-ir-free-palestine-tag/train.jsonl",
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv"
@@ -27,7 +28,6 @@ async function decolonizepalestine ()
 	// https://decolonizepalestine.com
 	const scraper = new WebScraper({
 		baseURL: "https://decolonizepalestine.com",
-		scrapResultPath: "./dataset/decolonizepalestine",
 		excludeList: [
 			"https://decolonizepalestine.com/cdn-cgi",
 			"https://decolonizepalestine.com/introduction-to-palestine",
@@ -39,6 +39,7 @@ async function decolonizepalestine ()
 			"https://decolonizepalestine.com/rainbow-washing",
 			"https://decolonizepalestine.com/"
 		],
+		scrapResultPath: "./dataset/decolonizepalestine",
 		jsonlPath: "./dataset/decolonizepalestine/train.jsonl",
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvPath: "./dataset/decolonizepalestine/train.csv"
@@ -49,7 +50,7 @@ async function decolonizepalestine ()
 void async function main ()
 {
 	await khameneiIrFreePalestineTag();
-	await decolonizepalestine();
+	// await decolonizepalestine();
 
 
 	// 3
