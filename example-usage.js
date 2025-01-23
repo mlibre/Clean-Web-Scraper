@@ -21,7 +21,8 @@ async function khameneiIrFreePalestineTag ()
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeTitles: true
 	});
-	await scraper.start();
+	// await scraper.start();
+	return scraper;
 }
 
 async function decolonizepalestine ()
@@ -46,14 +47,18 @@ async function decolonizepalestine ()
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv"
 	});
-	await scraper.start();
+	// await scraper.start();
+	return scraper;
 }
 
 void async function main ()
 {
-	await khameneiIrFreePalestineTag();
-	await decolonizepalestine();
-
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
+	const decolonizepalestineScraper = await decolonizepalestine();
+	WebScraper.combineResults( "./dataset/combined", [
+		khameneiIrFreePalestineTagScraper,
+		decolonizepalestineScraper
+	] );
 
 	// 3
 	// https://bdsmovement.net

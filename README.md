@@ -13,7 +13,8 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🎯 No duplicate page visits
 - 📊 Generates JSONL output file for ML training
 - 📊 AI-friendly clean text and csv output (perfect for LLM fine-tuning!)
-- 📊 Rich metadata extraction including:
+- 📊 Rich metadata extraction
+- 📁 Combine results from multiple scrapers into a unified dataset
 
 ## 🛠️ Prerequisites
 
@@ -55,8 +56,10 @@ const scraper = new WebScraper({
   maxDepth: 3,                                  // Optional: Maximum depth for recursive crawling
   includeTitles: true,                          // Optional: Include page titles in outputs
 });
-
 scraper.start();
+
+// Combine results from multiple scrapers
+WebScraper.combineResults('./combined-dataset', [scraper1, scraper2]);
 ```
 
 ```bash

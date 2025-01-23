@@ -269,6 +269,55 @@ class WebScraper
 		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
+
+	static combineResults ( outputPath, websites )
+	{
+		const fullOutputPath = path.join( __dirname, outputPath );
+
+		// Create output directories
+		fs.mkdirSync( fullOutputPath, { recursive: true });
+		fs.mkdirSync( path.join( fullOutputPath, "texts" ), { recursive: true });
+
+		// Combine JSONL files
+		const jsonlOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.jsonl" ) );
+		for ( const website of websites )
+		{
+			const jsonlContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPath ), "utf-8" );
+			jsonlOutput.write( jsonlContent );
+		}
+		jsonlOutput.end();
+
+		// Combine CSV files
+		const csvOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.csv" ) );
+		csvOutput.write( "text\n" );
+		for ( const website of websites )
+		{
+			const csvContent = fs.readFileSync( path.join( __dirname, website.csvOutputPath ), "utf-8" )
+			.split( "\n" )
+			.slice( 1 ) // Skip header
+			.filter( line => { return line.trim() });
+			csvOutput.write( `${csvContent.join( "\n" ) }\n` );
+		}
+		csvOutput.end();
+
+		// Combine text files
+		let textFileCounter = 1;
+		for ( const website of websites )
+		{
+			const textFiles = fs.readdirSync( path.join( __dirname, website.textOutputPath ) );
+			for ( const file of textFiles )
+			{
+				const content = fs.readFileSync( path.join( __dirname, website.textOutputPath, file ), "utf-8" );
+				fs.writeFileSync(
+					path.join( fullOutputPath, "texts", `${textFileCounter}.txt` ),
+					content,
+					"utf-8"
+				);
+				textFileCounter++;
+			}
+		}
+	}
+
 }
 
 module.exports = WebScraper;
