@@ -1,6 +1,6 @@
 {
   "name": "clean-web-scraper",
-  "version": "2.3.3",
+  "version": "3.0.0",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
@@ -16,7 +16,8 @@
     "ai-ready-web-scraper",
     "ai",
     "fine-tune",
-    "data-processing"
+    "data-processing",
+    "dataset"
   ],
   "author": "",
   "license": "ISC",

@@ -19,7 +19,8 @@ async function khameneiIrFreePalestineTag ()
 		jsonlOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.jsonl",
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
-		includeTitles: true
+		includeMetadata: true,
+		metadataFields: ["title", "description", "author", "lastModified", "language", "ogTags"]
 	});
 	await scraper.start();
 	return scraper;
@@ -45,7 +46,9 @@ async function decolonizepalestine ()
 		scrapResultPath: "./dataset/decolonizepalestine/website",
 		jsonlOutputPath: "./dataset/decolonizepalestine/train.jsonl",
 		textOutputPath: "./dataset/decolonizepalestine/texts",
-		csvOutputPath: "./dataset/decolonizepalestine/train.csv"
+		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
+		includeMetadata: true,
+		metadataFields: ["title", "description", "author", "lastModified", "language"]
 	});
 	await scraper.start();
 	return scraper;

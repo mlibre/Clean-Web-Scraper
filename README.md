@@ -52,9 +52,10 @@ const scraper = new WebScraper({
   scrapResultPath: './example.com/website',     // Required: Where to save the content
   jsonlOutputPath: './example.com/train.jsonl', // Optional: Custom JSONL output path
   textOutputPath: "./example.com/texts",        // Optional: Custom text output path
-  csvOutputPath: "./example.com/train.csv"      // Optional: Custom CSV output path
+  csvOutputPath: "./example.com/train.csv",     // Optional: Custom CSV output path
   maxDepth: 3,                                  // Optional: Maximum depth for recursive crawling
-  includeTitles: true,                          // Optional: Include page titles in outputs
+  includeMetadata: false,                       // Optional: Include metadata in output files
+  metadataFields: ['title', 'description']      // Optional: Specify metadata fields to include
 });
 scraper.start();
 
@@ -85,11 +86,16 @@ example.com/
 │   └── blog/
 │       ├── post1.txt
 │       └── post1.json
-│── texts/           # Numbered text files
-│       ├── 1.txt
-│       ├── 2.txt
-│── train.jsonl      # Combined content
-└── train.csv        # Clean text in CSV format
+├── texts/                # Numbered text files
+│   ├── 1.txt
+│   └── 2.txt
+├── texts_with_metadata/  # When includeMetadata is true
+│   ├── 1.txt
+│   └── 2.txt
+├── train.jsonl           # Combined content
+├── train_with_metadata.jsonl  # When includeMetadata is true
+├── train.csv             # Clean text in CSV format
+└── train_with_metadata.csv    # When includeMetadata is true
 ```
 
 ## 🤖 AI/LLM Training Ready

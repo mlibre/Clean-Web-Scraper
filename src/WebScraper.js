@@ -17,7 +17,8 @@ class WebScraper
 		jsonlOutputPath,
 		textOutputPath,
 		csvOutputPath,
-		includeTitles = false
+		includeMetadata = false,
+		metadataFields = [] // ['title', 'description', 'author', 'lastModified', etc.]
 	})
 	{
 		this.baseURL = baseURL;
@@ -27,7 +28,10 @@ class WebScraper
 		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
 		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
-		this.includeTitles = includeTitles;
+		this.jsonlOutputPathWithMeta = jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
+		this.csvOutputPathWithMeta = csvOutputPath.replace( ".csv", "_with_metadata.csv" );
+		this.includeMetadata = includeMetadata;
+	   this.metadataFields = new Set( metadataFields );
 		this.visited = new Set();
 		this.excludeList = new Set( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
@@ -118,9 +122,18 @@ class WebScraper
 	{
 		const processedContent = this.processContent( content );
 
-		this.allProcessedContent.push({
+		const simpleContent = {
+			text: processedContent.trim()
+		};
+
+		const contentWithMetadata = {
 			text: processedContent.trim(),
-			metadata
+			metadata: this.filterMetadata( metadata )
+		};
+
+		this.allProcessedContent.push({
+			simple: simpleContent,
+			withMetadata: contentWithMetadata
 		});
 
 		let urlPath = new URL( url ).pathname;
@@ -140,50 +153,118 @@ class WebScraper
 
 	createJSONLFile ()
 	{
-		const writeStream = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPath ) );
+		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPath ) );
+		let writeStreamMeta
+		if ( this.includeMetadata )
+		{
+			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPathWithMeta ) );
+		}
 		for ( const content of this.allProcessedContent )
 		{
-			const jsonLine = `${JSON.stringify( content )}\n`;
-			writeStream.write( jsonLine );
+			writeStreamSimple.write( `${JSON.stringify( content.simple )}\n` );
+			if ( this.includeMetadata )
+			{
+				writeStreamMeta.write( `${JSON.stringify( content.withMetadata )}\n` );
+			}
 		}
-
-		writeStream.end();
+		writeStreamSimple.end();
+		if ( this.includeMetadata )
+		{
+			writeStreamMeta.end();
+		}
 		console.log( `Created JSONL file at: ${this.jsonlOutputPath}` );
 	}
 
 	createCSVFile ()
 	{
-		const writeStream = fs.createWriteStream( path.join( __dirname, this.csvOutputPath ) );
-		writeStream.write( "text\n" );
-		for ( const content of this.allProcessedContent )
+		// Create simple version
+		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.csvOutputPath ) );
+		writeStreamSimple.write( "text\n" );
+
+		// Create metadata version if requested
+		let writeStreamMeta;
+		if ( this.includeMetadata )
 		{
-			let fullText = content.text;
-			if ( this.includeTitles && content.metadata.title )
-			{
-				fullText = `Title: ${content.metadata.title}\n\n${content.text}`;
-			}
-			const escapedText = fullText.replace( /"/g, "\"\"" );
-			const csvLine = `"${escapedText}"\n`;
-			writeStream.write( csvLine );
+			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.csvOutputPathWithMeta ) );
 		}
 
-		writeStream.end();
-		console.log( `Created CSV file at: ${this.csvOutputPath}` );
+		if ( this.includeMetadata )
+		{
+			const headers = ["text", ...Array.from( this.metadataFields )].join( "," );
+			writeStreamMeta.write( `${headers}\n` );
+		}
+
+		for ( const content of this.allProcessedContent )
+		{
+			// Write simple version
+			const escapedText = content.simple.text.replace( /"/g, "\"\"" );
+			writeStreamSimple.write( `"${escapedText}"\n` );
+
+			// Write metadata version if requested
+			if ( this.includeMetadata )
+			{
+				const { metadata } = content.withMetadata;
+				const metadataValues = Array.from( this.metadataFields )
+				.map( field => { return metadata[field] ? `"${metadata[field].replace( /"/g, "\"\"" )}"` : "\"\"" });
+				writeStreamMeta.write( `"${escapedText}",${metadataValues.join( "," )}\n` );
+			}
+		}
+
+		writeStreamSimple.end();
+		if ( writeStreamMeta )
+		{
+			writeStreamMeta.end();
+		}
+		console.log( `Created simple CSV file at: ${this.csvOutputPath}` );
+		if ( this.includeMetadata )
+		{
+			console.log( `Created metadata CSV file at: ${this.csvOutputPathWithMeta}` );
+		}
 	}
 
 	saveNumberedTextFiles ()
 	{
+		// Create base text folder for simple content
+		const baseTextPath = path.join( __dirname, this.textOutputPath );
+
+		// Create metadata text folder if needed
+		let metaTextPath = null;
+		if ( this.includeMetadata )
+		{
+			metaTextPath = path.join( __dirname, `${this.textOutputPath }_with_metadata` );
+			fs.mkdirSync( metaTextPath, { recursive: true });
+		}
+
 		this.allProcessedContent.forEach( ( content, index ) =>
 		{
 			const fileName = `${index + 1}.txt`;
-			const filePath = path.join( __dirname, this.textOutputPath, fileName );
-			let titlePrefix = "";
-			if ( this.includeTitles && content.metadata.title )
+
+			// Always save simple version
+			const simpleFilePath = path.join( baseTextPath, fileName );
+			fs.writeFileSync( simpleFilePath, content.simple.text, "utf-8" );
+			console.log( `Created simple text file: ${fileName}` );
+
+			// Save metadata version if enabled
+			if ( this.includeMetadata )
 			{
-				titlePrefix = `Title: ${content.metadata.title}\n\n`;
+				const metaFilePath = path.join( metaTextPath, fileName );
+				let fileContent = "";
+
+				const { metadata } = content.withMetadata;
+				// Add metadata fields as headers
+				for ( const field of this.metadataFields )
+				{
+					if ( metadata[field] )
+					{
+						fileContent += `${field}: ${metadata[field]}\n`;
+					}
+				}
+				fileContent += "\n---\n\n";
+				fileContent += content.withMetadata.text;
+
+				fs.writeFileSync( metaFilePath, fileContent, "utf-8" );
+				console.log( `Created metadata text file: ${fileName}` );
 			}
-			fs.writeFileSync( filePath, titlePrefix + content.text, "utf-8" );
-			console.log( `Created numbered text file: ${fileName}` );
 		});
 	}
 
@@ -209,6 +290,21 @@ class WebScraper
 		return processed;
 	}
 
+	filterMetadata ( metadata )
+	{
+		if ( !this.includeMetadata ) return {};
+
+		const filteredMetadata = {};
+		for ( const field of this.metadataFields )
+		{
+			if ( metadata[field] && typeof metadata[field] === "string" )
+			{
+				filteredMetadata[field] = metadata[field];
+			}
+		}
+		return filteredMetadata;
+	}
+
 	metadataextractor ( url, document, headers )
 	{
 		return {
@@ -222,12 +318,10 @@ class WebScraper
 			contentLength: headers["content-length"],
 			language: document.documentElement.lang || document.querySelector( "html" )?.getAttribute( "lang" ),
 			canonicalUrl: document.querySelector( "link[rel=\"canonical\"]" )?.href,
-			ogTags: {
-				title: document.querySelector( "meta[property=\"og:title\"]" )?.content,
-				description: document.querySelector( "meta[property=\"og:description\"]" )?.content,
-				image: document.querySelector( "meta[property=\"og:image\"]" )?.content,
-				type: document.querySelector( "meta[property=\"og:type\"]" )?.content
-			},
+			ogTitle: document.querySelector( "meta[property=\"og:title\"]" )?.content,
+			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )?.content,
+			ogImage: document.querySelector( "meta[property=\"og:image\"]" )?.content,
+			ogType: document.querySelector( "meta[property=\"og:type\"]" )?.content,
 			dateScraped: new Date().toISOString()
 		};
 	}
@@ -317,7 +411,6 @@ class WebScraper
 			}
 		}
 	}
-
 }
 
 module.exports = WebScraper;
