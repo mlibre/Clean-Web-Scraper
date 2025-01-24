@@ -20,7 +20,7 @@ async function khameneiIrFreePalestineTag ()
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author", "lastModified", "language"]
+		metadataFields: ["title", "description", "author"]
 	});
 	await scraper.start();
 	return scraper;
@@ -48,7 +48,7 @@ async function decolonizepalestine ()
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author", "lastModified", "language"]
+		metadataFields: ["title", "description", "author"]
 	});
 	await scraper.start();
 	return scraper;
