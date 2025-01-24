@@ -155,9 +155,14 @@ class WebScraper
 	{
 		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPath ) );
 		let writeStreamMeta
+
+		// Add error handlers
+		writeStreamSimple.on( "error", ( err ) => { return console.error( "Error writing JSONL:", err ) });
+
 		if ( this.includeMetadata )
 		{
 			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPathWithMeta ) );
+			writeStreamMeta.on( "error", ( err ) => { return console.error( "Error writing metadata JSONL:", err ) });
 		}
 		for ( const content of this.allProcessedContent )
 		{
@@ -171,6 +176,7 @@ class WebScraper
 		if ( this.includeMetadata )
 		{
 			writeStreamMeta.end();
+			console.log( `Created JSONL file at: ${this.jsonlOutputPathWithMeta}` );
 		}
 		console.log( `Created JSONL file at: ${this.jsonlOutputPath}` );
 	}
@@ -179,6 +185,7 @@ class WebScraper
 	{
 		// Create simple version
 		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.csvOutputPath ) );
+		writeStreamSimple.on( "error", ( err ) => { return console.error( "Error writing CSV:", err ) });
 		writeStreamSimple.write( "text\n" );
 
 		// Create metadata version if requested
@@ -186,6 +193,7 @@ class WebScraper
 		if ( this.includeMetadata )
 		{
 			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.csvOutputPathWithMeta ) );
+			writeStreamMeta.on( "error", ( err ) => { return console.error( "Error writing metadata CSV:", err ) });
 		}
 
 		if ( this.includeMetadata )
@@ -365,6 +373,11 @@ class WebScraper
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
 
+	static sleep ( ms )
+	{
+		return new Promise( resolve => { return setTimeout( resolve, ms ) });
+	}
+
 	static combineResults ( outputPath, websites )
 	{
 		const fullOutputPath = path.join( __dirname, outputPath );
@@ -375,8 +388,10 @@ class WebScraper
 		fs.mkdirSync( path.join( fullOutputPath, "texts_with_metadata" ), { recursive: true });
 
 		// Combine regular JSONL files
-		const jsonlOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.jsonl" ) );
-		const jsonlMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.jsonl" ) );
+		const jsonlOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.jsonl" ) )
+		    .on( "error", ( err ) => { return console.error( "Error combining JSONL:", err ) });
+		const jsonlMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.jsonl" ) )
+		    .on( "error", ( err ) => { return console.error( "Error combining metadata JSONL:", err ) });
 		const csvOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.csv" ) );
 		const csvMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.csv" ) );
 
@@ -449,7 +464,6 @@ class WebScraper
 			}
 		}
 	}
-
 }
 
 module.exports = WebScraper;

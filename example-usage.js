@@ -22,7 +22,7 @@ async function khameneiIrFreePalestineTag ()
 		includeMetadata: true,
 		metadataFields: ["title", "description", "author", "lastModified", "language"]
 	});
-	await scraper.start();
+	// await scraper.start();
 	return scraper;
 }
 
@@ -50,7 +50,7 @@ async function decolonizepalestine ()
 		includeMetadata: true,
 		metadataFields: ["title", "description", "author", "lastModified", "language"]
 	});
-	await scraper.start();
+	// await scraper.start();
 	return scraper;
 }
 
@@ -58,6 +58,7 @@ void async function main ()
 {
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
 	const decolonizepalestineScraper = await decolonizepalestine();
+	await WebScraper.sleep( 1000 ); // Sleeps for 1 second
 	WebScraper.combineResults( "./dataset/combined", [
 		khameneiIrFreePalestineTagScraper,
 		decolonizepalestineScraper
