@@ -36,11 +36,11 @@ class WebScraper
 		this.excludeList = new Set( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
 		this.allProcessedContent = [];
-		this.createOutputDirectory();
 	}
 
 	async start ()
 	{
+		this.createOutputDirectory();
 		await this.fetchPage( this.startURL, 0 );
 		this.createJSONLFile();
 		this.saveNumberedTextFiles();
@@ -384,6 +384,10 @@ class WebScraper
 		const fullOutputPath = path.join( __dirname, outputPath );
 
 		// Create output directories
+		if ( fs.existsSync( fullOutputPath ) )
+		{
+			fs.rmSync( fullOutputPath, { recursive: true, force: true });
+		}
 		fs.mkdirSync( fullOutputPath, { recursive: true });
 		fs.mkdirSync( path.join( fullOutputPath, "texts" ), { recursive: true });
 		fs.mkdirSync( path.join( fullOutputPath, "texts_with_metadata" ), { recursive: true });
