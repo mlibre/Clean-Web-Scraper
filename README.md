@@ -11,10 +11,10 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🚫 Excludes unwanted paths from scraping
 - 🔄 Handles relative and absolute URLs like a pro
 - 🎯 No duplicate page visits
-- 📊 Generates JSONL output file for ML training
-- 📊 AI-friendly clean text and csv output (perfect for LLM fine-tuning!)
+- 🤖 AI-friendly output formats (JSONL, CSV, clean text)
 - 📊 Rich metadata extraction
 - 📁 Combine results from multiple scrapers into a unified dataset
+- 🎯 Turn any website into an AI training dataset
 
 ## 🛠️ Prerequisites
 
@@ -58,13 +58,35 @@ const scraper = new WebScraper({
   metadataFields: ['title', 'description']      // Optional: Specify metadata fields to include
 });
 await scraper.start();
-
-// Combine results from multiple scrapers
-await WebScraper.combineResults('./combined-dataset', [scraper1, scraper2]);
 ```
 
 ```bash
 node example-usage.js
+```
+
+## 💻 Advanced Usage: Multi-Site Scraping
+
+```js
+const WebScraper = require('clean-web-scraper');
+
+// Scrape documentation website
+const docsScraper = new WebScraper({
+  baseURL: 'https://docs.example.com',
+  scrapResultPath: './datasets/docs'
+});
+
+// Scrape blog website
+const blogScraper = new WebScraper({
+  baseURL: 'https://blog.example.com',
+  scrapResultPath: './datasets/blog'
+});
+
+// Start scraping both sites
+await docsScraper.start();
+await blogScraper.start();
+
+// Combine all scraped content into a single dataset
+await WebScraper.combineResults('./combined-dataset', [docsScraper, blogScraper]);
 ```
 
 ## 📤 Output
@@ -100,7 +122,7 @@ example.com/
 
 ## 🤖 AI/LLM Training Ready
 
-The output is specifically formatted for AI training purposes:
+The output is specifically formatted for AI training and fine-tuning purposes:
 
 - Clean, processed text without HTML markup
 - Multiple formats (JSONL, CSV, text files)
