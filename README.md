@@ -53,9 +53,6 @@ const scraper = new WebScraper({
   jsonlOutputPath: './example.com/train.jsonl', // Optional: Custom JSONL output path
   textOutputPath: "./example.com/texts",        // Optional: Custom text output path
   csvOutputPath: "./example.com/train.csv",     // Optional: Custom CSV output path
-  maxDepth: 3,                                  // Optional: Maximum depth for recursive crawling
-  includeMetadata: false,                       // Optional: Include metadata in output files
-  metadataFields: ['title', 'description']      // Optional: Specify metadata fields to include
 });
 await scraper.start();
 ```
@@ -72,13 +69,19 @@ const WebScraper = require('clean-web-scraper');
 // Scrape documentation website
 const docsScraper = new WebScraper({
   baseURL: 'https://docs.example.com',
-  scrapResultPath: './datasets/docs'
+  scrapResultPath: './datasets/docs',
+  maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
+  includeMetadata: true,                     // Optional: Include metadata in output files
+  metadataFields: ['title', 'description']   // Optional: Specify metadata fields to include
 });
 
 // Scrape blog website
 const blogScraper = new WebScraper({
   baseURL: 'https://blog.example.com',
-  scrapResultPath: './datasets/blog'
+  scrapResultPath: './datasets/blog',
+  maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
+  includeMetadata: true,                     // Optional: Include metadata in output files
+  metadataFields: ['title', 'description']   // Optional: Specify metadata fields to include
 });
 
 // Start scraping both sites
