@@ -138,10 +138,13 @@ combined/
 
 ### 📝 Text Files (*.txt)
 
+```text
 The actual article content starts here. This is the clean, processed text of the article that was extracted from the webpage
+```
 
 ### 📑 Text Files with Metadata (texts_with_metadata/*.txt)
 
+```text
 title: My Awesome Page
 description: This is a great article about coding
 author: John Doe
@@ -151,6 +154,7 @@ dateScraped: 2024-01-20T10:30:00Z
 \-\-\-
 
 The actual article content starts here. This is the clean, processed text of the article that was extracted from the webpage.
+```
 
 ### 📊 JSONL Files (train.jsonl)
 
