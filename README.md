@@ -56,10 +56,6 @@ const scraper = new WebScraper({
 await scraper.start();
 ```
 
-```bash
-node example-usage.js
-```
-
 ## 💻 Advanced Usage: Multi-Site Scraping
 
 ```js
@@ -89,6 +85,10 @@ await blogScraper.start();
 
 // Combine all scraped content into a single dataset
 await WebScraper.combineResults('./combined', [docsScraper, blogScraper]);
+```
+
+```bash
+node example-usage.js
 ```
 
 ## 📤 Output
