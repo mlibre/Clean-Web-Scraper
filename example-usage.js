@@ -22,7 +22,7 @@ async function khameneiIrFreePalestineTag ()
 		includeMetadata: true,
 		metadataFields: ["title", "description", "author", "lastModified", "language"]
 	});
-	// await scraper.start();
+	await scraper.start();
 	return scraper;
 }
 
@@ -50,7 +50,7 @@ async function decolonizepalestine ()
 		includeMetadata: true,
 		metadataFields: ["title", "description", "author", "lastModified", "language"]
 	});
-	// await scraper.start();
+	await scraper.start();
 	return scraper;
 }
 
