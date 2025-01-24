@@ -98,7 +98,7 @@ Your AI-ready content is saved in a clean, structured format:
 - 📁 Base folder: `./folderPath/example.com/`
 - 📑 Files preserve original URL paths
 - 🤖 No HTML, no noise - just clean, structured text (`.txt` files)
-- 📊 `JSONL` and `CSV` outputs, ready for AI consumption and model training
+- 📊 `JSONL` and `CSV` outputs, ready for AI consumption, model training and fine-tuning
 
 ```bash
 example.com/
@@ -196,15 +196,6 @@ text,title,author,description
 "Article content","Page Title","John Doe","Page description"
 "Another article","Second Page","Jane Smith","Another description"
 ```
-
-## 🤖 AI/LLM Training Ready
-
-The output is specifically formatted for AI training and fine-tuning purposes:
-
-- Clean, processed text without HTML markup
-- Multiple formats (JSONL, CSV, text files)
-- Structured content perfect for fine-tuning LLMs
-- Ready to use in your ML pipelines
 
 ## Standing with Palestine 🇵🇸
 
