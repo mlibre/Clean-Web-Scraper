@@ -57,10 +57,10 @@ const scraper = new WebScraper({
   includeMetadata: false,                       // Optional: Include metadata in output files
   metadataFields: ['title', 'description']      // Optional: Specify metadata fields to include
 });
-scraper.start();
+await scraper.start();
 
 // Combine results from multiple scrapers
-WebScraper.combineResults('./combined-dataset', [scraper1, scraper2]);
+await WebScraper.combineResults('./combined-dataset', [scraper1, scraper2]);
 ```
 
 ```bash

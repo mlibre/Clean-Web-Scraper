@@ -58,8 +58,7 @@ void async function main ()
 {
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
 	const decolonizepalestineScraper = await decolonizepalestine();
-	await WebScraper.sleep( 1000 ); // Sleeps for 1 second
-	WebScraper.combineResults( "./dataset/combined", [
+	await WebScraper.combineResults( "./dataset/combined", [
 		khameneiIrFreePalestineTagScraper,
 		decolonizepalestineScraper
 	] );

@@ -378,8 +378,9 @@ class WebScraper
 		return new Promise( resolve => { return setTimeout( resolve, ms ) });
 	}
 
-	static combineResults ( outputPath, websites )
+	static async combineResults ( outputPath, websites )
 	{
+		await WebScraper.sleep( 1000 );
 		const fullOutputPath = path.join( __dirname, outputPath );
 
 		// Create output directories
