@@ -20,7 +20,7 @@ async function khameneiIrFreePalestineTag ()
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author", "lastModified", "language", "ogTags"]
+		metadataFields: ["title", "description", "author", "lastModified", "language"]
 	});
 	await scraper.start();
 	return scraper;
