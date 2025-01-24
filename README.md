@@ -95,12 +95,10 @@ node example-usage.js
 
 Your AI-ready content is saved in a clean, structured format:
 
-- 📁 Base folder: ./folderPath/example.com/
+- 📁 Base folder: `./folderPath/example.com/`
 - 📑 Files preserve original URL paths
-- 📝 Pure text format, perfect for LLM training and fine-tuning
-- 🤖 No HTML, no mess - just clean, structured text ready for AI consumption
-- 📊 JSONL output for ML training
-- 📈 CSV output with clean text content
+- 🤖 No HTML, no noise - just clean, structured text (`.txt` files)
+- 📊 `JSONL` and `CSV` outputs, ready for AI consumption and model training
 
 ```bash
 example.com/
