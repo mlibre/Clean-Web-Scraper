@@ -14,7 +14,6 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 - 🤖 AI-friendly output formats (JSONL, CSV, clean text)
 - 📊 Rich metadata extraction
 - 📁 Combine results from multiple scrapers into a unified dataset
-- 🎯 Turn any website into an AI training dataset
 
 ## 🛠️ Prerequisites
 
