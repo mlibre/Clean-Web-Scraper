@@ -68,5 +68,12 @@ void async function main ()
 
 	// 4
 	// https://electronicintifada.net/
+
+	// 5
+	// https://www.palestineremembered.com/ZionistFAQ.html
+
+	// 6 https://the-palestinian-side.vercel.app/
+
+	// 7 https://stand-with-palestine.org/blogs
 }()
 

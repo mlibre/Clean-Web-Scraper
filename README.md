@@ -86,7 +86,7 @@ await docsScraper.start();
 await blogScraper.start();
 
 // Combine all scraped content into a single dataset
-await WebScraper.combineResults('./combined-dataset', [docsScraper, blogScraper]);
+await WebScraper.combineResults('./combined', [docsScraper, blogScraper]);
 ```
 
 ## 📤 Output
@@ -118,6 +118,79 @@ example.com/
 ├── train_with_metadata.jsonl  # When includeMetadata is true
 ├── train.csv             # Clean text in CSV format
 └── train_with_metadata.csv    # When includeMetadata is true
+
+combined/
+├── texts/                # Combined numbered text files
+│   ├── 1.txt
+│   ├── 2.txt
+│   └── n.txt
+├── texts_with_metadata/  # Combined metadata text files
+│   ├── 1.txt
+│   ├── 2.txt
+│   └── n.txt
+├── combined.jsonl        # Combined JSONL content
+├── combined_with_metadata.jsonl
+├── combined.csv         # Combined CSV content
+└── combined_with_metadata.csv
+```
+
+## 📄 Output File Formats
+
+### 📝 Text Files (*.txt)
+
+The actual article content starts here. This is the clean, processed text of the article that was extracted from the webpage
+
+### 📑 Text Files with Metadata (texts_with_metadata/*.txt)
+
+title: My Awesome Page
+description: This is a great article about coding
+author: John Doe
+language: en
+dateScraped: 2024-01-20T10:30:00Z
+
+\-\-\-
+
+The actual article content starts here. This is the clean, processed text of the article that was extracted from the webpage.
+
+### 📊 JSONL Files (train.jsonl)
+
+```json
+{"text": "Clean article content here"}
+{"text": "Another article content here"}
+```
+
+### 📈 JSONL with Metadata (train_with_metadata.jsonl)
+
+```json
+{"text": "Article content", "metadata": {"title": "Page Title", "author": "John Doe"}}
+{"text": "Another article", "metadata": {"title": "Second Page", "author": "Jane Smith"}}
+```
+
+### 🗃️ JSON Files In Website Output  (*.json)
+
+```json
+{
+  "url": "<https://example.com/page>",
+  "title": "Page Title",
+  "description": "Page description",
+  "dateScraped": "2024-01-20T10:30:00Z"
+}
+```
+
+### 📋 CSV Files (train.csv)
+
+```csv
+text
+"Clean article content here"
+"Another article content here"
+```
+
+### 📊 CSV with Metadata (train_with_metadata.csv)
+
+```csv
+text,title,author,description
+"Article content","Page Title","John Doe","Page description"
+"Another article","Second Page","Jane Smith","Another description"
 ```
 
 ## 🤖 AI/LLM Training Ready
