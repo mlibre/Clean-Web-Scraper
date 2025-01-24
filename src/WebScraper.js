@@ -384,6 +384,16 @@ class WebScraper
 		const fullOutputPath = path.join( __dirname, outputPath );
 
 		// Create output directories
+		WebScraper.createCombinedDirectories( fullOutputPath );
+
+		// Combine files by type
+		WebScraper.combineJSONLFiles( fullOutputPath, websites );
+		WebScraper.combineCSVFiles( fullOutputPath, websites );
+		WebScraper.combineTextFiles( fullOutputPath, websites );
+	}
+
+	static createCombinedDirectories ( fullOutputPath )
+	{
 		if ( fs.existsSync( fullOutputPath ) )
 		{
 			fs.rmSync( fullOutputPath, { recursive: true, force: true });
@@ -391,38 +401,54 @@ class WebScraper
 		fs.mkdirSync( fullOutputPath, { recursive: true });
 		fs.mkdirSync( path.join( fullOutputPath, "texts" ), { recursive: true });
 		fs.mkdirSync( path.join( fullOutputPath, "texts_with_metadata" ), { recursive: true });
+	}
 
-		// Combine regular JSONL files
+	static combineJSONLFiles ( fullOutputPath, websites )
+	{
 		const jsonlOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.jsonl" ) )
-		    .on( "error", ( err ) => { return console.error( "Error combining JSONL:", err ) });
+		.on( "error", ( err ) => { return console.error( "Error combining JSONL:", err ) });
 		const jsonlMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.jsonl" ) )
-		    .on( "error", ( err ) => { return console.error( "Error combining metadata JSONL:", err ) });
-		const csvOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.csv" ) );
-		const csvMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.csv" ) );
+		.on( "error", ( err ) => { return console.error( "Error combining metadata JSONL:", err ) });
 
-		csvOutput.write( "text\n" );
-		const metadataFields = websites.find( w => { return w.includeMetadata })?.metadataFields || new Set();
-		if ( metadataFields.size > 0 )
-		{
-			csvMetaOutput.write( `text,${Array.from( metadataFields ).join( "," )}\n` );
-		}
 		for ( const website of websites )
 		{
 			const jsonlContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPath ), "utf-8" );
 			jsonlOutput.write( jsonlContent );
 
+			if ( website.includeMetadata )
+			{
+				const jsonlMetaContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPathWithMeta ), "utf-8" );
+				jsonlMetaOutput.write( jsonlMetaContent );
+			}
+		}
+
+		jsonlOutput.end();
+		jsonlMetaOutput.end();
+	}
+
+	static combineCSVFiles ( fullOutputPath, websites )
+	{
+		const csvOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.csv" ) );
+		const csvMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.csv" ) );
+
+		csvOutput.write( "text\n" );
+		const metadataFields = websites.find( w => { return w.includeMetadata })?.metadataFields || new Set();
+
+		if ( metadataFields.size > 0 )
+		{
+			csvMetaOutput.write( `text,${Array.from( metadataFields ).join( "," )}\n` );
+		}
+
+		for ( const website of websites )
+		{
 			const csvContent = fs.readFileSync( path.join( __dirname, website.csvOutputPath ), "utf-8" )
 			.split( "\n" )
 			.slice( 1 )
 			.filter( line => { return line.trim() });
 			csvOutput.write( `${csvContent.join( "\n" )}\n` );
 
-			// Combine metadata files if they exist
 			if ( website.includeMetadata )
 			{
-				const jsonlMetaContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPathWithMeta ), "utf-8" );
-				jsonlMetaOutput.write( jsonlMetaContent );
-
 				const csvMetaContent = fs.readFileSync( path.join( __dirname, website.csvOutputPathWithMeta ), "utf-8" )
 				.split( "\n" )
 				.slice( 1 )
@@ -431,18 +457,18 @@ class WebScraper
 			}
 		}
 
-		// Close all streams
-		jsonlOutput.end();
-		jsonlMetaOutput.end();
 		csvOutput.end();
 		csvMetaOutput.end();
+	}
 
-		// Combine text files (both regular and metadata versions)
+	static combineTextFiles ( fullOutputPath, websites )
+	{
 		let textFileCounter = 1;
+
 		for ( const website of websites )
 		{
-			// Regular text files
 			const textFiles = fs.readdirSync( path.join( __dirname, website.textOutputPath ) );
+
 			for ( const file of textFiles )
 			{
 				const content = fs.readFileSync( path.join( __dirname, website.textOutputPath, file ), "utf-8" );
@@ -452,7 +478,6 @@ class WebScraper
 					"utf-8"
 				);
 
-				// Metadata text files if they exist
 				if ( website.includeMetadata )
 				{
 					const metaContent = fs.readFileSync(
@@ -469,6 +494,7 @@ class WebScraper
 			}
 		}
 	}
+
 }
 
 module.exports = WebScraper;
