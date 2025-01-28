@@ -18,7 +18,8 @@ class WebScraper
 		textOutputPath,
 		csvOutputPath,
 		includeMetadata = false,
-		metadataFields = [] // ['title', 'description', 'author', 'lastModified', etc.]
+		metadataFields = [], // ['title', 'description', 'author', 'lastModified', etc.]
+		userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0"
 	})
 	{
 		this.baseURL = baseURL;
@@ -30,10 +31,11 @@ class WebScraper
 		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
 		this.jsonlOutputPathWithMeta = jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
 		this.csvOutputPathWithMeta = csvOutputPath.replace( ".csv", "_with_metadata.csv" );
+		this.userAgent = userAgent;
 		this.includeMetadata = includeMetadata;
 	   this.metadataFields = new Set( metadataFields );
 		this.visited = new Set();
-		this.excludeList = new Set( excludeList );
+		this.excludeList = this.normalizeExcludeList( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
 		this.allProcessedContent = [];
 	}
@@ -57,7 +59,11 @@ class WebScraper
 		this.visited.add( url );
 		try
 		{
-			const { data, headers } = await axios.get( url );
+			const { data, headers } = await axios.get( url, {
+				headers: {
+					"user-agent": this.userAgent
+				}
+			});
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
 
@@ -334,7 +340,7 @@ class WebScraper
 		};
 	}
 
-	normalizeExcludeList ( list )
+	normalizeExcludeList ( list = [] )
 	{
 		const normalizedSet = new Set();
 		for ( let i = 0; i < list.length; i++ )

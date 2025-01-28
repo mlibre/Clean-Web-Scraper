@@ -3,15 +3,12 @@ const WebScraper = require( "./src/WebScraper" );
 
 async function khameneiIrFreePalestineTag ()
 {
-	// 1
 	// https://english.khamenei.ir/Opinions/FreePalestine
 	// https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#
 	const scraper = new WebScraper({
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 		maxDepth: 1,
-		excludeList: [
-		],
 		exactExcludeList: [
 			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#"
 		],
@@ -28,7 +25,6 @@ async function khameneiIrFreePalestineTag ()
 
 async function decolonizepalestine ()
 {
-	// 2
 	// https://decolonizepalestine.com
 	const scraper = new WebScraper({
 		baseURL: "https://decolonizepalestine.com",
@@ -54,17 +50,40 @@ async function decolonizepalestine ()
 	return scraper;
 }
 
+async function bdsmovement ()
+{
+	// https://bdsmovement.org
+	const scraper = new WebScraper({
+		baseURL: "https://bdsmovement.org",
+		excludeList: [
+			"https://bdsmovement.net/press-area",
+			"https://bdsmovement.net/privacy-policy",
+			"https://bdsmovement.net/get-involved/join-a-bds-campaign",
+			"https://bdsmovement.net/donate_",
+			"https://bdsmovement.net/user",
+			"https://bdsmovement.net/admin"
+		],
+		scrapResultPath: "./dataset/bdsmovement/website",
+		jsonlOutputPath: "./dataset/bdsmovement/train.jsonl",
+		textOutputPath: "./dataset/bdsmovement/texts",
+		csvOutputPath: "./dataset/bdsmovement/train.csv",
+		includeMetadata: true,
+		metadataFields: ["title", "description", "author"]
+	});
+	await scraper.start();
+	return scraper;
+}
+
 void async function main ()
 {
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
-	const decolonizepalestineScraper = await decolonizepalestine();
-	await WebScraper.combineResults( "./dataset/combined", [
-		khameneiIrFreePalestineTagScraper,
-		decolonizepalestineScraper
-	] );
-
-	// 3
-	// https://bdsmovement.net
+	// const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
+	// const decolonizepalestineScraper = await decolonizepalestine();
+	const bdsmovementScraper = await bdsmovement();
+	// await WebScraper.combineResults( "./dataset/combined", [
+	// 	khameneiIrFreePalestineTagScraper,
+	// 	decolonizepalestineScraper,
+	// 	bdsmovementScraper
+	// ] );
 
 	// 4
 	// https://electronicintifada.net/
