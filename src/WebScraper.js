@@ -19,7 +19,11 @@ class WebScraper
 		csvOutputPath,
 		includeMetadata = false,
 		metadataFields = [], // ['title', 'description', 'author', 'lastModified', etc.]
-		userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0"
+		headers = {
+			"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0",
+			"Cache-Control": "private",
+			"Accept": "application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5"
+		}
 	})
 	{
 		this.baseURL = baseURL;
@@ -31,7 +35,7 @@ class WebScraper
 		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
 		this.jsonlOutputPathWithMeta = jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
 		this.csvOutputPathWithMeta = csvOutputPath.replace( ".csv", "_with_metadata.csv" );
-		this.userAgent = userAgent;
+		this.headers = headers;
 		this.includeMetadata = includeMetadata;
 	   this.metadataFields = new Set( metadataFields );
 		this.visited = new Set();
@@ -60,9 +64,7 @@ class WebScraper
 		try
 		{
 			const { data, headers } = await axios.get( url, {
-				headers: {
-					"user-agent": this.userAgent
-				}
+				headers: this.headers,
 			});
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
@@ -74,9 +76,17 @@ class WebScraper
 
 				if ( article )
 				{
-					const metadata = this.metadataextractor( url, document, headers );
-					metadata.depth = depth;
-					this.saveArticle( url, article.textContent, metadata );
+					if ( this.isValidContent( article.textContent ) )
+					{
+
+						const metadata = this.metadataextractor( url, document, headers );
+						metadata.depth = depth;
+						this.saveArticle( url, article.textContent, metadata );
+					}
+					else
+					{
+						console.error( `Invalid content found at ${url}` );
+					}
 				}
 				else
 				{
@@ -373,7 +383,26 @@ class WebScraper
 		if ( fs.existsSync( path.join( __dirname, this.scrapResultPath ) ) )
 		{
 			fs.rmSync( path.join( __dirname, this.scrapResultPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.textOutputPath ) ) )
+		{
 			fs.rmSync( path.join( __dirname, this.textOutputPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.csvOutputPath ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.csvOutputPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.csvOutputPathWithMeta ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.csvOutputPathWithMeta ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPath ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.jsonlOutputPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPathWithMeta ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.jsonlOutputPathWithMeta ), { recursive: true, force: true });
 		}
 		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
@@ -465,6 +494,30 @@ class WebScraper
 
 		csvOutput.end();
 		csvMetaOutput.end();
+	}
+
+	isValidContent ( content )
+	{
+		// Remove whitespace and newlines for checking
+		const cleanContent = content.replace( /\s+/g, " " ).trim().toLowerCase();
+
+		// List of phrases that indicate invalid content
+		const invalidPhrases = [
+			"verifying that you are not a robot",
+			"checking if the site connection is secure",
+			"please wait while we verify",
+			"please enable javascript",
+			"access denied",
+			"captcha verification"
+		];
+
+		const hasInvalidPhrases = invalidPhrases.some( phrase => { return cleanContent.includes( phrase ) });
+		// Check content length
+		if ( cleanContent.length < 100 && hasInvalidPhrases )
+		{
+			return false;
+		}
+		return true;
 	}
 
 	static combineTextFiles ( fullOutputPath, websites )
