@@ -22,6 +22,7 @@ class WebScraper
 		includeMetadata = false,
 		metadataFields = [], // ['title', 'description', 'author', 'lastModified', etc.]
 		headers,
+		usePuppeteer,
 		puppeteerProxy, // e.g. http://127.0.0.1:2080
 		puppeteerExecutablePath,
 		puppeteerRealProxy
@@ -43,7 +44,7 @@ class WebScraper
 		this.excludeList = this.normalizeExcludeList( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
 		this.allProcessedContent = [];
-		this.usePuppeteer = false;
+		this.usePuppeteer = usePuppeteer || false;
 		this.puppeteerOptions = {
 			headless: false,
 			userDataDir: "./tmp/browser",
@@ -71,16 +72,39 @@ class WebScraper
 			ignoreAllFlags: false,
 			proxy: puppeteerRealProxy
 		}
+		this.puppeteerBrowser = null;
+		this.puppeteerPage = null;
 	}
 
 	async start ()
 	{
-		this.createOutputDirectory();
-		await this.fetchPage( this.startURL, 0 );
-		this.createJSONLFile();
-		this.saveNumberedTextFiles();
-		this.createCSVFile();
-		console.log( "Scraping completed." );
+		try
+		{
+			if ( this.usePuppeteer )
+			{
+				let { browser, page } = await connect( this.puppeteerRealOptions )
+				this.puppeteerBrowser = browser;
+				this.puppeteerPage = page;
+			}
+			this.createOutputDirectory();
+			await this.fetchPage( this.startURL, 0 );
+			this.createJSONLFile();
+			this.saveNumberedTextFiles();
+			this.createCSVFile();
+			console.log( "Scraping completed." );
+		}
+		catch ( error )
+		{
+			console.error( "Error:", error );
+			throw error;
+		}
+		finally
+		{
+			if ( this.puppeteerBrowser )
+			{
+				await this.puppeteerBrowser.close(); // Close the browser after scraping
+			}
+		}
 	}
 
 	async fetchPage ( url, depth )
@@ -152,49 +176,50 @@ class WebScraper
 			console.error( `Error fetching ${url}:`, error.message );
 			if ( error.status = 403 && this.usePuppeteer )
 			{
-				let { browser, page } = await connect( this.puppeteerRealOptions )
-
 				// const browser = await puppeteer.launch( this.puppeteerOptions );
 				// const page = await browser.newPage();
 				try
 				{
-					let htmlContent;
+					let result;
 					for ( let index = 0; index < 10; index++ )
 					{
-						const pages = await browser.pages();
-						page = pages[0];
-						page.setDefaultNavigationTimeout( 30000 )
-						await page.goto( url );
 						console.log( `Please solve the CAPTCHA on the opened browser window for ${url}` );
-						await this.waitForPageToLoad( page );
-						htmlContent = await page.content();
-						if ( this.isValidContent( htmlContent ) )
+						result = await this.goToUrl( url ) ;
+						if ( this.isValidContent( result.htmlContent ) )
 						{
 							break
 						}
-						page = pages[0];
-						page.setDefaultNavigationTimeout( 30000 )
-						await this.waitForPageToLoad( page );
-						htmlContent = await page.content();
-						if ( this.isValidContent( htmlContent ) )
-						{
-							break
-						}
-						await page.goto( url );
 					}
-					return htmlContent;
+					return result.htmlContent;
 				}
 				catch ( error )
 				{
 					console.error( `Error solving CAPTCHA for ${url}:`, error.message, error );
 					throw error;
 				}
-				finally
-				{
-					await browser.close(); // Close the browser after scraping
-				}
+
 			}
 			throw error;
+		}
+	}
+
+	async goToUrl ( url )
+	{
+		let pages = await this.puppeteerBrowser.pages();
+		let page = pages[0];
+		page.setDefaultNavigationTimeout( 10000 );
+		await page.goto( url );
+		pages = await this.puppeteerBrowser.pages();
+		page = pages[0];
+		page.setDefaultNavigationTimeout( 10000 );
+		await this.waitForPageToLoad( page );
+		pages = await this.puppeteerBrowser.pages();
+		page = pages[0];
+		page.setDefaultNavigationTimeout( 10000 );
+		if ( page )
+		{
+			let htmlContent = await page.content();
+			return { pages, page, htmlContent };
 		}
 	}
 

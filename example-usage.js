@@ -82,7 +82,8 @@ async function bdsmovement ()
 		puppeteerRealProxy: {
 			host: "socks5://127.0.0.1",
 			port: "2080",
-		}
+		},
+		usePuppeteer: true
 	});
 	await scraper.start();
 	return scraper;
@@ -114,13 +115,13 @@ async function electronicintifada ()
 
 void async function main ()
 {
-	// const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
 	const decolonizepalestineScraper = await decolonizepalestine();
-	// const bdsmovementScraper = await bdsmovement();
+	const bdsmovementScraper = await bdsmovement();
 	await WebScraper.combineResults( "./dataset/combined", [
-		// khameneiIrFreePalestineTagScraper,
+		khameneiIrFreePalestineTagScraper,
 		decolonizepalestineScraper,
-		// bdsmovementScraper
+		bdsmovementScraper
 	] );
 
 	// 4
