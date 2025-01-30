@@ -1,5 +1,13 @@
 const WebScraper = require( "./src/WebScraper" );
 
+// const cookies = "cf_clearance=ENHJkpw.ycd1tZ_A.d0O27QdslTN0EHaNurhCznfimg-1738241402-1.2.1.1-BlO.WitkGwE3U3vSamX35xP.AgN1HyvHWL03Jhe.twbn4QWojiw1T4.0M4lE_TcIeZrQ6ErwV9kQBMBKmfU0S6lQth1BJx7UpWn4T6wtFm83LmF.cB13PQYSQgGFGsH7qOkGIjbBhMbceQNp.y2XZgLq_hdntGKSBMe0iCUotx_xsqlzkolQIqnUYID3BLEQXZqNvqJOwkzLZ7.kzrwP42VdEuWEvT4jt7F3TkTaU9rumAp8FSNO1.hnr76Tv23OITm17rPD3__Ghdu1D0E.4v693nEiVYO_KQYNf_8gk0vXP.KAvUKA2zQyBmDXkfW3M1MkoLjFNZCanx9FPRVO7g";
+// const headers = {
+// 	"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0",
+// 	"Cache-Control": "private",
+// 	"Accept": "application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5",
+// 	"Cookie": cookies
+// }
+
 
 async function khameneiIrFreePalestineTag ()
 {
@@ -52,9 +60,9 @@ async function decolonizepalestine ()
 
 async function bdsmovement ()
 {
-	// https://bdsmovement.org
+	// https://bdsmovement.net
 	const scraper = new WebScraper({
-		baseURL: "https://bdsmovement.org",
+		baseURL: "https://bdsmovement.net",
 		excludeList: [
 			"https://bdsmovement.net/press-area",
 			"https://bdsmovement.net/privacy-policy",
@@ -68,6 +76,36 @@ async function bdsmovement ()
 		textOutputPath: "./dataset/bdsmovement/texts",
 		csvOutputPath: "./dataset/bdsmovement/train.csv",
 		includeMetadata: true,
+		metadataFields: ["title", "description", "author"],
+		puppeteerProxy: "socks5://127.0.0.1:2080",
+		puppeteerExecutablePath: "/usr/bin/chromium",
+		puppeteerRealProxy: {
+			host: "socks5://127.0.0.1",
+			port: "2080",
+		}
+	});
+	await scraper.start();
+	return scraper;
+}
+
+async function electronicintifada ()
+{
+	// https://electronicintifada.net
+	const scraper = new WebScraper({
+		baseURL: "https://electronicintifada.net",
+		excludeList: [
+			"https://electronicintifada.net/press-area",
+			"https://electronicintifada.net/privacy-policy",
+			"https://electronicintifada.net/get-involved/join-a-bds-campaign",
+			"https://electronicintifada.net/donate_",
+			"https://electronicintifada.net/user",
+			"https://electronicintifada.net/admin"
+		],
+		scrapResultPath: "./dataset/electronicintifada/website",
+		jsonlOutputPath: "./dataset/electronicintifada/train.jsonl",
+		textOutputPath: "./dataset/electronicintifada/texts",
+		csvOutputPath: "./dataset/electronicintifada/train.csv",
+		includeMetadata: true,
 		metadataFields: ["title", "description", "author"]
 	});
 	await scraper.start();
@@ -76,11 +114,11 @@ async function bdsmovement ()
 
 void async function main ()
 {
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
+	// const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
 	const decolonizepalestineScraper = await decolonizepalestine();
 	// const bdsmovementScraper = await bdsmovement();
 	await WebScraper.combineResults( "./dataset/combined", [
-		khameneiIrFreePalestineTagScraper,
+		// khameneiIrFreePalestineTagScraper,
 		decolonizepalestineScraper,
 		// bdsmovementScraper
 	] );

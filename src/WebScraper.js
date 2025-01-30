@@ -4,6 +4,8 @@ const { JSDOM } = jsdom;
 const { Readability } = require( "@mozilla/readability" );
 const fs = require( "fs" );
 const path = require( "path" );
+const puppeteer = require( "puppeteer" );
+const { connect } = require( "puppeteer-real-browser" )
 
 class WebScraper
 {
@@ -19,11 +21,10 @@ class WebScraper
 		csvOutputPath,
 		includeMetadata = false,
 		metadataFields = [], // ['title', 'description', 'author', 'lastModified', etc.]
-		headers = {
-			"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0",
-			"Cache-Control": "private",
-			"Accept": "application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5"
-		}
+		headers,
+		puppeteerProxy, // e.g. http://127.0.0.1:2080
+		puppeteerExecutablePath,
+		puppeteerRealProxy
 	})
 	{
 		this.baseURL = baseURL;
@@ -42,6 +43,34 @@ class WebScraper
 		this.excludeList = this.normalizeExcludeList( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
 		this.allProcessedContent = [];
+		this.usePuppeteer = false;
+		this.puppeteerOptions = {
+			headless: false,
+			userDataDir: "./tmp/browser",
+			defaultViewport: null,
+			args: [
+				"--start-maximized"
+			],
+			"ignoreDefaultArgs": true,
+		}
+		if ( puppeteerProxy )
+		{
+			this.puppeteerOptions.args.push( `--proxy-server=${puppeteerProxy}` );
+		}
+		if ( puppeteerExecutablePath )
+		{
+			this.puppeteerOptions.executablePath = puppeteerExecutablePath;
+		}
+		this.puppeteerRealOptions = {
+			headless: false,
+			args: [],
+			customConfig: {},
+			turnstile: true,
+			connectOption: {},
+			disableXvfb: false,
+			ignoreAllFlags: false,
+			proxy: puppeteerRealProxy
+		}
 	}
 
 	async start ()
@@ -63,9 +92,7 @@ class WebScraper
 		this.visited.add( url );
 		try
 		{
-			const { data, headers } = await axios.get( url, {
-				headers: this.headers,
-			});
+			const data = await this.caller( url );
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
 
@@ -78,8 +105,7 @@ class WebScraper
 				{
 					if ( this.isValidContent( article.textContent ) )
 					{
-
-						const metadata = this.metadataextractor( url, document, headers );
+						const metadata = this.metadataextractor( url, document );
 						metadata.depth = depth;
 						this.saveArticle( url, article.textContent, metadata );
 					}
@@ -106,6 +132,81 @@ class WebScraper
 		catch ( error )
 		{
 			console.error( `Error fetching ${url}:`, error.message );
+		}
+	}
+
+	async caller ( url )
+	{
+		try
+		{
+			let axiosOptinos = {}
+			if ( this.headers )
+			{
+				axiosOptinos.headers = this.headers
+			}
+			const result = await axios.get( url, axiosOptinos );
+			return result.data
+		}
+		catch ( error )
+		{
+			console.error( `Error fetching ${url}:`, error.message );
+			if ( error.status = 403 && this.usePuppeteer )
+			{
+				let { browser, page } = await connect( this.puppeteerRealOptions )
+
+				// const browser = await puppeteer.launch( this.puppeteerOptions );
+				// const page = await browser.newPage();
+				try
+				{
+					let htmlContent;
+					for ( let index = 0; index < 10; index++ )
+					{
+						const pages = await browser.pages();
+						page = pages[0];
+						page.setDefaultNavigationTimeout( 30000 )
+						await page.goto( url );
+						console.log( `Please solve the CAPTCHA on the opened browser window for ${url}` );
+						await this.waitForPageToLoad( page );
+						htmlContent = await page.content();
+						if ( this.isValidContent( htmlContent ) )
+						{
+							break
+						}
+						page = pages[0];
+						page.setDefaultNavigationTimeout( 30000 )
+						await this.waitForPageToLoad( page );
+						htmlContent = await page.content();
+						if ( this.isValidContent( htmlContent ) )
+						{
+							break
+						}
+						await page.goto( url );
+					}
+					return htmlContent;
+				}
+				catch ( error )
+				{
+					console.error( `Error solving CAPTCHA for ${url}:`, error.message, error );
+					throw error;
+				}
+				finally
+				{
+					await browser.close(); // Close the browser after scraping
+				}
+			}
+			throw error;
+		}
+	}
+
+	async waitForPageToLoad ( page )
+	{
+		try
+		{
+			await page.waitForNavigation({ waitUntil: "networkidle0" });
+		}
+		catch ( error )
+		{
+			console.log( error );
 		}
 	}
 
@@ -329,7 +430,7 @@ class WebScraper
 		return filteredMetadata;
 	}
 
-	metadataextractor ( url, document, headers )
+	metadataextractor ( url, document )
 	{
 		return {
 			url,
@@ -337,9 +438,6 @@ class WebScraper
 			description: document.querySelector( "meta[name=\"description\"]" )?.content,
 			keywords: document.querySelector( "meta[name=\"keywords\"]" )?.content,
 			author: document.querySelector( "meta[name=\"author\"]" )?.content,
-			lastModified: headers["last-modified"],
-			contentType: headers["content-type"],
-			contentLength: headers["content-length"],
 			language: document.documentElement.lang || document.querySelector( "html" )?.getAttribute( "lang" ),
 			canonicalUrl: document.querySelector( "link[rel=\"canonical\"]" )?.href,
 			ogTitle: document.querySelector( "meta[property=\"og:title\"]" )?.content,
@@ -416,16 +514,19 @@ class WebScraper
 		// List of phrases that indicate invalid content
 		const invalidPhrases = [
 			"verifying that you are not a robot",
+			"verifying you are human. this may take a few seconds.",
+			"verify you are human by completing the action below",
 			"checking if the site connection is secure",
 			"please wait while we verify",
 			"please enable javascript",
 			"access denied",
+			"verifying you are human",
 			"captcha verification"
 		];
 
 		const hasInvalidPhrases = invalidPhrases.some( phrase => { return cleanContent.includes( phrase ) });
 		// Check content length
-		if ( cleanContent.length < 100 && hasInvalidPhrases )
+		if ( cleanContent.length < 100 || hasInvalidPhrases )
 		{
 			return false;
 		}
