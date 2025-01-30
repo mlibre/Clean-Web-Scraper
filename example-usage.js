@@ -76,14 +76,14 @@ async function bdsmovement ()
 
 void async function main ()
 {
-	// const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
-	// const decolonizepalestineScraper = await decolonizepalestine();
-	const bdsmovementScraper = await bdsmovement();
-	// await WebScraper.combineResults( "./dataset/combined", [
-	// 	khameneiIrFreePalestineTagScraper,
-	// 	decolonizepalestineScraper,
-	// 	bdsmovementScraper
-	// ] );
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
+	const decolonizepalestineScraper = await decolonizepalestine();
+	// const bdsmovementScraper = await bdsmovement();
+	await WebScraper.combineResults( "./dataset/combined", [
+		khameneiIrFreePalestineTagScraper,
+		decolonizepalestineScraper,
+		// bdsmovementScraper
+	] );
 
 	// 4
 	// https://electronicintifada.net/

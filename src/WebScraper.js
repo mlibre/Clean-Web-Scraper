@@ -408,6 +408,30 @@ class WebScraper
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
 
+	isValidContent ( content )
+	{
+		// Remove whitespace and newlines for checking
+		const cleanContent = content.replace( /\s+/g, " " ).trim().toLowerCase();
+
+		// List of phrases that indicate invalid content
+		const invalidPhrases = [
+			"verifying that you are not a robot",
+			"checking if the site connection is secure",
+			"please wait while we verify",
+			"please enable javascript",
+			"access denied",
+			"captcha verification"
+		];
+
+		const hasInvalidPhrases = invalidPhrases.some( phrase => { return cleanContent.includes( phrase ) });
+		// Check content length
+		if ( cleanContent.length < 100 && hasInvalidPhrases )
+		{
+			return false;
+		}
+		return true;
+	}
+
 	static sleep ( ms )
 	{
 		return new Promise( resolve => { return setTimeout( resolve, ms ) });
@@ -448,12 +472,18 @@ class WebScraper
 		for ( const website of websites )
 		{
 			const jsonlContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPath ), "utf-8" );
-			jsonlOutput.write( jsonlContent );
+			if ( jsonlContent )
+			{
+				jsonlOutput.write( jsonlContent );
+			}
 
 			if ( website.includeMetadata )
 			{
 				const jsonlMetaContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPathWithMeta ), "utf-8" );
-				jsonlMetaOutput.write( jsonlMetaContent );
+				if ( jsonlMetaContent )
+				{
+					jsonlMetaOutput.write( jsonlMetaContent );
+				}
 			}
 		}
 
@@ -480,7 +510,10 @@ class WebScraper
 			.split( "\n" )
 			.slice( 1 )
 			.filter( line => { return line.trim() });
-			csvOutput.write( `${csvContent.join( "\n" )}\n` );
+			if ( csvContent.length > 0 )
+			{
+				csvOutput.write( `${csvContent.join( "\n" )}\n` );
+			}
 
 			if ( website.includeMetadata )
 			{
@@ -488,36 +521,15 @@ class WebScraper
 				.split( "\n" )
 				.slice( 1 )
 				.filter( line => { return line.trim() });
-				csvMetaOutput.write( `${csvMetaContent.join( "\n" )}\n` );
+				if ( csvMetaContent.length > 0 )
+				{
+					csvMetaOutput.write( `${csvMetaContent.join( "\n" )}\n` );
+				}
 			}
 		}
 
 		csvOutput.end();
 		csvMetaOutput.end();
-	}
-
-	isValidContent ( content )
-	{
-		// Remove whitespace and newlines for checking
-		const cleanContent = content.replace( /\s+/g, " " ).trim().toLowerCase();
-
-		// List of phrases that indicate invalid content
-		const invalidPhrases = [
-			"verifying that you are not a robot",
-			"checking if the site connection is secure",
-			"please wait while we verify",
-			"please enable javascript",
-			"access denied",
-			"captcha verification"
-		];
-
-		const hasInvalidPhrases = invalidPhrases.some( phrase => { return cleanContent.includes( phrase ) });
-		// Check content length
-		if ( cleanContent.length < 100 && hasInvalidPhrases )
-		{
-			return false;
-		}
-		return true;
 	}
 
 	static combineTextFiles ( fullOutputPath, websites )
@@ -553,7 +565,6 @@ class WebScraper
 			}
 		}
 	}
-
 }
 
 module.exports = WebScraper;
