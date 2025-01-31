@@ -159,7 +159,7 @@ class WebScraper
 		}
 		catch ( error )
 		{
-			console.error( `Error fetching ${url}:`, error.message );
+			console.error( `Error fetching ${url}:`, error.message, error.code );
 		}
 	}
 
@@ -167,13 +167,44 @@ class WebScraper
 	{
 		try
 		{
-			let axiosOptinos = {}
+			let axiosOptions = {};
 			if ( this.headers )
 			{
-				axiosOptinos.headers = this.headers
+				axiosOptions.headers = this.headers;
 			}
-			const result = await axios.get( url, axiosOptinos );
-			return result.data
+
+			// Step 1: Make a GET request with a small timeout and limited data download
+			const response = await axios.get( url, {
+				...axiosOptions,
+				responseType: "stream",
+				maxRedirects: 5,
+				timeout: 70000
+			});
+
+			// Step 2: Check the Content-Type header from the response
+			const contentType = response.headers["content-type"] || "";
+			if ( !contentType.startsWith( "text" ) )
+			{
+				console.log( `Skipping non-HTML content for ${url}: Content-Type is ${contentType}` );
+				response.data.destroy(); // Destroy the stream to stop downloading further data
+				return null; // Skip further processing for non-HTML content
+			}
+
+			// Step 3: If Content-Type is HTML, read the full response
+			let htmlContent = "";
+			response.data.on( "data", ( chunk ) =>
+			{
+				htmlContent += chunk.toString();
+			});
+
+			// Wait for the stream to finish
+			await new Promise( ( resolve, reject ) =>
+			{
+				response.data.on( "end", resolve );
+				response.data.on( "error", reject );
+			});
+
+			return htmlContent;
 		}
 		catch ( error )
 		{
