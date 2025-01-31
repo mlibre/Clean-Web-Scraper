@@ -125,6 +125,7 @@ class WebScraper
 		try
 		{
 			const data = await this.caller( url );
+			if ( !data ) return;
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
 
