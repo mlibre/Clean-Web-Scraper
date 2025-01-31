@@ -13,6 +13,7 @@ class WebScraper
 		baseURL,
 		startURL,
 		maxDepth = Infinity,
+		maxArticles = Infinity, // Add this line
 		excludeList,
 		exactExcludeList,
 		scrapResultPath = "./dataset",
@@ -33,6 +34,7 @@ class WebScraper
 		this.baseURL = baseURL;
 		this.startURL = startURL || baseURL;
 		this.maxDepth = maxDepth;
+		this.maxArticles = maxArticles; // Add this line
 		this.scrapResultPath = scrapResultPath;
 		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
@@ -113,6 +115,11 @@ class WebScraper
 
 	async fetchPage ( url, depth )
 	{
+		if ( this.allProcessedContent.length >= this.maxArticles )
+		{
+			console.log( `Reached maximum number of articles (${this.maxArticles})` );
+			return;
+		}
 		if ( depth > this.maxDepth )
 		{
 			return;

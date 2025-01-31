@@ -89,7 +89,8 @@ await WebScraper.combineResults('./combined', [docsScraper, blogScraper]);
 ```
 
 ```bash
-node example-usage.js
+# 8 GB RAM
+node --max-old-space-size=8192 example-usage.js
 ```
 
 ## 📤 Output
