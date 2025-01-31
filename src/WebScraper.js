@@ -437,6 +437,23 @@ class WebScraper
 		// processed = processed.replace(/\[.*?\]/g, ''); // Removes all content within square brackets
 		// processed = processed.replace(/\(.*?\)/g, ''); // Removes all content within parentheses
 
+		// Remove specified words from the end of content, handling multiple occurrences
+		const wordsToTrim = ["Facebook", "Twitter", "Donate Now", "Instagram"];
+		let changed = true;
+
+		while ( changed )
+		{
+			changed = false;
+			for ( let i = 0; i < wordsToTrim.length; i++ )
+			{
+				const oldProcessed = processed;
+				processed = processed.replace( new RegExp( `\\s*${wordsToTrim[i]}\\s*$`, "g" ), "" ).trim();
+				if ( oldProcessed !== processed )
+				{
+					changed = true;
+				}
+			}
+		}
 		return processed;
 	}
 

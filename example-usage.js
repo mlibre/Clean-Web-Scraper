@@ -83,7 +83,7 @@ async function bdsmovement ()
 			host: "socks5://127.0.0.1",
 			port: "2080",
 		},
-		usePuppeteer: true
+		// usePuppeteer: true
 	});
 	await scraper.start();
 	return scraper;
@@ -95,12 +95,19 @@ async function electronicintifada ()
 	const scraper = new WebScraper({
 		baseURL: "https://electronicintifada.net",
 		excludeList: [
-			"https://electronicintifada.net/press-area",
-			"https://electronicintifada.net/privacy-policy",
-			"https://electronicintifada.net/get-involved/join-a-bds-campaign",
-			"https://electronicintifada.net/donate_",
-			"https://electronicintifada.net/user",
-			"https://electronicintifada.net/admin"
+			"https://electronicintifada.net/updates",
+			"https://electronicintifada.net/taxonomy/term/",
+			"https://electronicintifada.net/tags/",
+			"https://electronicintifada.net/blog",
+			"https://electronicintifada.net/people",
+			"https://electronicintifada.net/location"
+		],
+		exactExcludeList: [
+			"https://electronicintifada.net",
+			"https://electronicintifada.net/blog",
+			"https://electronicintifada.net/news",
+			"https://electronicintifada.net/opinion",
+			"https://electronicintifada.net/review",
 		],
 		scrapResultPath: "./dataset/electronicintifada/website",
 		jsonlOutputPath: "./dataset/electronicintifada/train.jsonl",
@@ -118,10 +125,12 @@ void async function main ()
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
 	const decolonizepalestineScraper = await decolonizepalestine();
 	const bdsmovementScraper = await bdsmovement();
+	const electronicintifadaScraper = await electronicintifada();
 	await WebScraper.combineResults( "./dataset/combined", [
 		khameneiIrFreePalestineTagScraper,
 		decolonizepalestineScraper,
-		bdsmovementScraper
+		bdsmovementScraper,
+		electronicintifadaScraper
 	] );
 
 	// 4
