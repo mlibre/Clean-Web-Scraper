@@ -20,7 +20,7 @@ class WebScraper
 		textOutputPath,
 		csvOutputPath,
 		includeMetadata = false,
-		metadataFields = [], // ['title', 'description', 'author', 'lastModified', etc.]
+		metadataFields = [], // ['title', 'description', 'author', etc.]
 		headers,
 		usePuppeteer,
 		puppeteerProxy, // e.g. http://127.0.0.1:2080

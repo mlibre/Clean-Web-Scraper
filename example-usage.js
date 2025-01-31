@@ -100,7 +100,8 @@ async function electronicintifada ()
 			"https://electronicintifada.net/tags/",
 			"https://electronicintifada.net/blog",
 			"https://electronicintifada.net/people",
-			"https://electronicintifada.net/location"
+			"https://electronicintifada.net/location",
+			"https://electronicintifada.net/file"
 		],
 		exactExcludeList: [
 			"https://electronicintifada.net",
@@ -132,9 +133,6 @@ void async function main ()
 		bdsmovementScraper,
 		electronicintifadaScraper
 	] );
-
-	// 4
-	// https://electronicintifada.net/
 
 	// 5
 	// https://www.palestineremembered.com/ZionistFAQ.html
