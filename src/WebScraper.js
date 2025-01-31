@@ -118,13 +118,17 @@ class WebScraper
 			return;
 		}
 		this.visited.add( url );
+		if ( !this.isValidFileType( url ) )
+		{
+			return;
+		}
 		try
 		{
 			const data = await this.caller( url );
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
 
-			if ( !this.isExcluded( url ) && this.isValidFileType( url ) )
+			if ( !this.isExcluded( url ) )
 			{
 				const reader = new Readability( document, { charThreshold: 500, nbTopCandidates: 20 });
 				const article = reader.parse();
