@@ -25,7 +25,9 @@ class WebScraper
 		usePuppeteer,
 		puppeteerProxy, // e.g. http://127.0.0.1:2080
 		puppeteerExecutablePath,
-		puppeteerRealProxy
+		puppeteerRealProxy,
+		filterFileTypes = true,
+		excludedFileTypes = [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"]
 	})
 	{
 		this.baseURL = baseURL;
@@ -44,6 +46,8 @@ class WebScraper
 		this.excludeList = this.normalizeExcludeList( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
 		this.allProcessedContent = [];
+		this.filterFileTypes = filterFileTypes;
+		this.excludedFileTypes = excludedFileTypes;
 		this.usePuppeteer = usePuppeteer || false;
 		this.puppeteerOptions = {
 			headless: false,
@@ -120,7 +124,7 @@ class WebScraper
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
 
-			if ( !this.isExcluded( url ) )
+			if ( !this.isExcluded( url ) && this.isValidFileType( url ) )
 			{
 				const reader = new Readability( document, { charThreshold: 500, nbTopCandidates: 20 });
 				const article = reader.parse();
@@ -546,6 +550,13 @@ class WebScraper
 		}
 		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
+	}
+
+	isValidFileType ( url )
+	{
+		if ( !this.filterFileTypes ) return true;
+		const urlPath = new URL( url ).pathname.toLowerCase();
+		return !this.excludedFileTypes.some( ext => { return urlPath.endsWith( ext ) });
 	}
 
 	isValidContent ( content )
