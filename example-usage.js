@@ -103,7 +103,8 @@ async function electronicintifada ()
 			"https://electronicintifada.net/location",
 			"https://electronicintifada.net/file",
 			"https://electronicintifada.net/bytopic/people",
-			"https://electronicintifada.net/comment/"
+			"https://electronicintifada.net/comment/",
+			"https://electronicintifada.net/search/site/"
 		],
 		exactExcludeList: [
 			"https://electronicintifada.net",
@@ -117,7 +118,7 @@ async function electronicintifada ()
 		textOutputPath: "./dataset/electronicintifada/texts",
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
-		maxArticles: 1000,
+		maxArticles: 2000,
 		metadataFields: ["title", "description", "author"]
 	});
 	await scraper.start();
