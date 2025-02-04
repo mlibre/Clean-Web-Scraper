@@ -22,7 +22,8 @@ class WebScraper
 		csvOutputPath,
 		includeMetadata = false,
 		metadataFields = [], // ['title', 'description', 'author', etc.]
-		headers,
+		axiosHeaders,
+		axiosProxy,
 		usePuppeteer,
 		puppeteerProxy, // e.g. http://127.0.0.1:2080
 		puppeteerExecutablePath,
@@ -41,7 +42,7 @@ class WebScraper
 		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
 		this.jsonlOutputPathWithMeta = jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
 		this.csvOutputPathWithMeta = csvOutputPath.replace( ".csv", "_with_metadata.csv" );
-		this.headers = headers;
+		this.axiosHeaders = axiosHeaders;
 		this.includeMetadata = includeMetadata;
 	   this.metadataFields = new Set( metadataFields );
 		this.visited = new Set();
@@ -50,6 +51,7 @@ class WebScraper
 		this.allProcessedContent = [];
 		this.filterFileTypes = filterFileTypes;
 		this.excludedFileTypes = excludedFileTypes;
+		this.axiosProxy = axiosProxy;
 		this.usePuppeteer = usePuppeteer || false;
 		this.puppeteerOptions = {
 			headless: false,
@@ -180,9 +182,13 @@ class WebScraper
 		try
 		{
 			let axiosOptions = {};
-			if ( this.headers )
+			if ( this.axiosHeaders )
 			{
-				axiosOptions.headers = this.headers;
+				axiosOptions.headers = this.axiosHeaders;
+			}
+			if ( this.axiosProxy )
+			{
+				axiosOptions.proxy = this.axiosProxy;
 			}
 
 			// Step 1: Make a GET request with a small timeout and limited data download

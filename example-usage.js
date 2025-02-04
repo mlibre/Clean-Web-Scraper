@@ -27,13 +27,15 @@ async function khameneiIrFreePalestineTag ()
 		includeMetadata: true,
 		metadataFields: ["title", "description", "author"]
 	});
-	await scraper.start();
+	if ( enable )
+	{
+		await scraper.start();
+	}
 	return scraper;
 }
 
-async function decolonizepalestine ()
+async function decolonizepalestine ( enable )
 {
-	// https://decolonizepalestine.com
 	const scraper = new WebScraper({
 		baseURL: "https://decolonizepalestine.com",
 		excludeList: [
@@ -54,13 +56,15 @@ async function decolonizepalestine ()
 		includeMetadata: true,
 		metadataFields: ["title", "description", "author"]
 	});
-	await scraper.start();
+	if ( enable )
+	{
+		await scraper.start();
+	}
 	return scraper;
 }
 
-async function bdsmovement ()
+async function bdsmovement ( enable )
 {
-	// https://bdsmovement.net
 	const scraper = new WebScraper({
 		baseURL: "https://bdsmovement.net",
 		excludeList: [
@@ -83,15 +87,16 @@ async function bdsmovement ()
 			host: "socks5://127.0.0.1",
 			port: "2080",
 		},
-		// usePuppeteer: true
 	});
-	await scraper.start();
+	if ( enable )
+	{
+		await scraper.start();
+	}
 	return scraper;
 }
 
-async function electronicintifada ()
+async function electronicintifada ( enable )
 {
-	// https://electronicintifada.net
 	const scraper = new WebScraper({
 		baseURL: "https://electronicintifada.net",
 		excludeList: [
@@ -121,21 +126,70 @@ async function electronicintifada ()
 		maxArticles: 2000,
 		metadataFields: ["title", "description", "author"]
 	});
-	await scraper.start();
+	if ( enable )
+	{
+		await scraper.start();
+	}
 	return scraper;
 }
 
+async function palestineremembered ( enable )
+{
+	const scraper = new WebScraper({
+		baseURL: "https://www.palestineremembered.com",
+		startURL: "https://www.palestineremembered.com/ZionistFAQ.html",
+		excludeList: [
+			"https://www.palestineremembered.com/GeoPoints",
+			"https://www.palestineremembered.com/Donate",
+			"https://www.palestineremembered.com/ContactUs.html",
+			"https://www.palestineremembered.com/tags/Looting-Palestinian-properties.html",
+			"https://www.palestineremembered.com/ar/",
+			"https://www.palestineremembered.com/OldNewPictures.html",
+			"https://www.palestineremembered.com/Maps/index.html",
+			"https://www.palestineremembered.com/OralHistory/Interviews-Listing/",
+			"https://www.palestineremembered.com/Acre/Famous-Zionist-Quotes/Story637.html",
+			"https://www.palestineremembered.com/Articles/General/Story2045.html",
+			"https://www.palestineremembered.com/AllTownsListing.html",
+			"https://www.palestineremembered.com/Articles/General/ar/",
+			"https://www.palestineremembered.com/SiteVideos.html"
+		],
+		exactExcludeList: [
+			"https://www.palestineremembered.com/index.html",
+			"https://www.palestineremembered.com/ZionistFAQ.html"
+		],
+		scrapResultPath: "./dataset/palestineremembered/website",
+		jsonlOutputPath: "./dataset/palestineremembered/train.jsonl",
+		textOutputPath: "./dataset/palestineremembered/texts",
+		csvOutputPath: "./dataset/palestineremembered/train.csv",
+		includeMetadata: true,
+		metadataFields: ["title", "description", "author"],
+		axiosProxy: {
+			host: "localhost",
+			port: 2080,
+			protocol: "http"
+		}
+	});
+	if ( enable )
+	{
+		await scraper.start();
+	}
+	return scraper;
+}
+
+
 void async function main ()
 {
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag();
-	const decolonizepalestineScraper = await decolonizepalestine();
-	const bdsmovementScraper = await bdsmovement();
-	const electronicintifadaScraper = await electronicintifada();
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( false );
+	const decolonizepalestineScraper = await decolonizepalestine( false );
+	const bdsmovementScraper = await bdsmovement( false );
+	const electronicintifadaScraper = await electronicintifada( false );
+	  const palestinerememberedScraper = await palestineremembered( true );
 	await WebScraper.combineResults( "./dataset/combined", [
 		khameneiIrFreePalestineTagScraper,
 		decolonizepalestineScraper,
 		bdsmovementScraper,
-		electronicintifadaScraper
+		electronicintifadaScraper,
+		palestinerememberedScraper
 	] );
 
 	// 5
