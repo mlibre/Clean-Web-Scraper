@@ -208,9 +208,9 @@ async function palestineremembered ( enable )
 
 void async function main ()
 {
-	const palianswersScraper = await palianswers( true );
-	const decolonizepalestineScraper = await decolonizepalestine( true );
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
+	const palianswersScraper = await palianswers( false );
+	const decolonizepalestineScraper = await decolonizepalestine( false );
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( false );
 	const electronicintifadaScraper = await electronicintifada( true );
 	const bdsmovementScraper = await bdsmovement( false );
 	const palestinerememberedScraper = await palestineremembered( false );

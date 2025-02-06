@@ -181,6 +181,7 @@ class WebScraper
 
 			for ( let i = 0; i < unvisitedLinks.length; i += this.concurrencyLimit )
 			{
+				await WebScraper.sleep( 2000 );
 				const batch = unvisitedLinks.slice( i, i + this.concurrencyLimit );
 				const results = await Promise.allSettled( batch.map( link => { return this.fetchPage( link, depth + 1 ) }) );
 
