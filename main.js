@@ -130,9 +130,8 @@ class WebScraper
 
 	async fetchPage ( url, depth )
 	{
-		if ( this.allProcessedContent.length >= this.maxArticles || depth > this.maxDepth )
+		if ( this.hasReachedMax( depth ) )
 		{
-			console.error( `Reached maximum: ${this.allProcessedContent.length}, ${this.maxDepth}` );
 			return;
 		}
 		if ( this.visited.has( url ) )
@@ -181,6 +180,10 @@ class WebScraper
 
 			for ( let i = 0; i < unvisitedLinks.length; i += this.concurrencyLimit )
 			{
+				if ( this.hasReachedMax( depth ) )
+				{
+					return;
+				}
 				await WebScraper.sleep( 5000 );
 				const batch = unvisitedLinks.slice( i, i + this.concurrencyLimit );
 				const results = await Promise.allSettled( batch.map( link => { return this.fetchPage( link, depth + 1 ) }) );
@@ -257,6 +260,16 @@ class WebScraper
 			}
 			throw error;
 		}
+	}
+
+	hasReachedMax ( depth )
+	{
+		if ( this.allProcessedContent.length >= this.maxArticles || depth > this.maxDepth )
+		{
+			console.error( `Reached maximum: ${this.allProcessedContent.length}, ${this.maxDepth} , ${depth}` );
+			return true;
+		}
+		return false;
 	}
 
 	async navigateToPage ( url )
