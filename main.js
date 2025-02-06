@@ -55,10 +55,11 @@ class WebScraper
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
-		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
-		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
+		this.textOutputPathWithMeta = `${this.textOutputPath }_with_metadata`;
+		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.jsonlOutputPathWithMeta = this.jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
+		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
 		this.csvOutputPathWithMeta = this.csvOutputPath.replace( ".csv", "_with_metadata.csv" );
 
 		// Metadata configuration
@@ -435,7 +436,7 @@ class WebScraper
 		let metaTextPath = null;
 		if ( this.includeMetadata )
 		{
-			metaTextPath = path.join( __dirname, `${this.textOutputPath }_with_metadata` );
+			metaTextPath = path.join( __dirname, this.textOutputPathWithMeta );
 			fs.mkdirSync( metaTextPath, { recursive: true });
 		}
 
@@ -691,6 +692,10 @@ class WebScraper
 		{
 			fs.rmSync( path.join( __dirname, this.textOutputPath ), { recursive: true, force: true });
 		}
+		if ( fs.existsSync( path.join( __dirname, this.textOutputPathWithMeta ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.textOutputPathWithMeta ), { recursive: true, force: true });
+		}
 		if ( fs.existsSync( path.join( __dirname, this.csvOutputPath ) ) )
 		{
 			fs.rmSync( path.join( __dirname, this.csvOutputPath ), { recursive: true, force: true });
@@ -709,6 +714,7 @@ class WebScraper
 		}
 		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
+		fs.mkdirSync( path.join( __dirname, this.textOutputPathWithMeta ), { recursive: true });
 	}
 
 	static async sleep ( ms )
@@ -831,7 +837,7 @@ class WebScraper
 				if ( website.includeMetadata )
 				{
 					const metaContent = fs.readFileSync(
-						path.join( __dirname, `${website.textOutputPath}_with_metadata`, file ),
+						path.join( __dirname, website.textOutputPathWithMeta, file ),
 						"utf-8"
 					);
 					fs.writeFileSync(
