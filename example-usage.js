@@ -137,13 +137,13 @@ async function electronicintifada ( enable )
 			"https://electronicintifada.net/file",
 			"https://electronicintifada.net/bytopic/people",
 			"https://electronicintifada.net/comment/",
-			"https://electronicintifada.net/search/site/"
+			"https://electronicintifada.net/search/site/",
+			"https://electronicintifada.net/news",
+			"https://electronicintifada.net/opinion",
 		],
 		exactExcludeList: [
 			"https://electronicintifada.net",
 			"https://electronicintifada.net/blog",
-			"https://electronicintifada.net/news",
-			"https://electronicintifada.net/opinion",
 			"https://electronicintifada.net/review",
 		],
 		scrapResultPath: "./dataset/electronicintifada/website",
