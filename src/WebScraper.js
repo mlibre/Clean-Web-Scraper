@@ -137,11 +137,7 @@ class WebScraper
 			return;
 		}
 		this.visited.add( url );
-		if ( !this.isValidFileType( url ) )
-		{
-			return;
-		}
-		if ( !this.isValidDomain( url ) )
+		if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
 		{
 			return;
 		}
