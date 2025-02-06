@@ -73,6 +73,15 @@ class WebScraper
 		// Network configuration
 		this.axiosHeaders = axiosHeaders;
 		this.axiosProxy = axiosProxy;
+		this.axiosOptions = {};
+		if ( this.axiosHeaders )
+		{
+			axiosOptions.headers = this.axiosHeaders;
+		}
+		if ( this.axiosProxy )
+		{
+			axiosOptions.proxy = this.axiosProxy;
+		}
 
 		// Content storage
 		this.allProcessedContent = [];
@@ -138,7 +147,7 @@ class WebScraper
 		}
 		try
 		{
-			const data = await this.caller( url );
+			const data = await this.fetchContent( url );
 			if ( !data ) return;
 			const dom = new JSDOM( data, { url });
 			const { document } = dom.window;
@@ -150,9 +159,9 @@ class WebScraper
 
 				if ( article )
 				{
-					if ( this.isValidContent( article.textContent ) )
+					if ( this.hasValidPageContent( article.textContent ) )
 					{
-						const metadata = this.metadataextractor( url, document );
+						const metadata = this.extractMetadata( url, document );
 						metadata.depth = depth;
 						this.saveArticle( url, article.textContent, metadata );
 					}
@@ -182,35 +191,23 @@ class WebScraper
 		}
 	}
 
-	async caller ( url )
+	async fetchContent ( url )
 	{
 		try
 		{
-			let axiosOptions = {};
-			if ( this.axiosHeaders )
-			{
-				axiosOptions.headers = this.axiosHeaders;
-			}
-			if ( this.axiosProxy )
-			{
-				axiosOptions.proxy = this.axiosProxy;
-			}
-
-			// Step 1: Make a GET request with a small timeout and limited data download
 			const response = await axios.get( url, {
-				...axiosOptions,
 				responseType: "stream",
 				maxRedirects: 5,
-				timeout: 70000
+				timeout: 70000,
+				...axiosOptions,
 			});
 
-			// Step 2: Check the Content-Type header from the response
 			const contentType = response.headers["content-type"] || "";
 			if ( !contentType.startsWith( "text" ) )
 			{
 				console.log( `Skipping non-HTML content for ${url}: Content-Type is ${contentType}` );
-				response.data.destroy(); // Destroy the stream to stop downloading further data
-				return null; // Skip further processing for non-HTML content
+				response.data.destroy();
+				return null;
 			}
 
 			// Step 3: If Content-Type is HTML, read the full response
@@ -242,8 +239,8 @@ class WebScraper
 					for ( let index = 0; index < 10; index++ )
 					{
 						console.log( `Please solve the CAPTCHA on the opened browser window for ${url}` );
-						result = await this.goToUrl( url ) ;
-						if ( this.isValidContent( result.htmlContent ) )
+						result = await this.navigateToPage( url ) ;
+						if ( this.hasValidPageContent( result.htmlContent ) )
 						{
 							break
 						}
@@ -261,7 +258,7 @@ class WebScraper
 		}
 	}
 
-	async goToUrl ( url )
+	async navigateToPage ( url )
 	{
 		let pages = await this.puppeteerBrowser.pages();
 		let page = pages[0];
@@ -530,7 +527,7 @@ class WebScraper
 		return filteredMetadata;
 	}
 
-	metadataextractor ( url, document )
+	extractMetadata ( url, document )
 	{
 		return {
 			url,
@@ -634,7 +631,7 @@ class WebScraper
 		}
 	}
 
-	isValidContent ( content )
+	hasValidPageContent ( content )
 	{
 		// Remove whitespace and newlines for checking
 		const cleanContent = content.replace( /\s+/g, " " ).trim().toLowerCase();
