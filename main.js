@@ -51,7 +51,7 @@ class WebScraper
 		this.maxDepth = maxDepth || Infinity;
 		this.maxArticles = maxArticles || Infinity;
 		this.concurrencyLimit = concurrencyLimit || 3;
-		this.maxRetries = maxRetries || 15;
+		this.maxRetries = maxRetries || 20;
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
@@ -563,7 +563,7 @@ class WebScraper
 			catch ( error )
 			{
 				if ( attempt === this.maxRetries ) throw error;
-				await WebScraper.sleep( 6000 * attempt );
+				await WebScraper.sleep( 10000 * attempt );
 				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.maxRetries})`, error.message, error.code );
 			}
 		}
