@@ -44,7 +44,7 @@ async function khameneiIrFreePalestineTag ( enable )
 	const scraper = new WebScraper({
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
-		maxDepth: 1,
+		maxDepth: 3,
 		exactExcludeList: [
 			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#"
 		],

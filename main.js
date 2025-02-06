@@ -129,7 +129,7 @@ class WebScraper
 	{
 		if ( this.allProcessedContent.length >= this.maxArticles || depth > this.maxDepth )
 		{
-			console.log( `Reached maximum: ${this.maxArticles}, ${this.maxDepth}` );
+			console.error( `Reached maximum: ${this.allProcessedContent.length}, ${this.maxDepth}` );
 			return;
 		}
 		if ( this.visited.has( url ) )
