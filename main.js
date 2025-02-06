@@ -49,7 +49,7 @@ class WebScraper
 		this.strictBaseURL = strictBaseURL || true;
 		this.maxDepth = maxDepth || Infinity;
 		this.maxArticles = maxArticles || Infinity;
-		this.concurrencyLimit = concurrencyLimit || 10;
+		this.concurrencyLimit = concurrencyLimit || 7;
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
@@ -551,7 +551,7 @@ class WebScraper
 			...this.axiosOptions,
 		};
 
-		let maxRetries = 10;
+		let maxRetries = 11;
 		for ( let attempt = 1; attempt <= maxRetries; attempt++ )
 		{
 			try
@@ -561,8 +561,8 @@ class WebScraper
 			catch ( error )
 			{
 				if ( attempt === maxRetries ) throw error;
-				await WebScraper.sleep( 4000 * attempt );
-				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${maxRetries})` );
+				await WebScraper.sleep( 5000 * attempt );
+				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${maxRetries})`, error.message, error.code );
 			}
 		}
 	}
