@@ -50,7 +50,7 @@ class WebScraper
 		this.strictBaseURL = strictBaseURL || true;
 		this.maxDepth = maxDepth || Infinity;
 		this.maxArticles = maxArticles || Infinity;
-		this.concurrencyLimit = concurrencyLimit || 3;
+		this.concurrencyLimit = concurrencyLimit || 2;
 		this.maxRetries = maxRetries || 20;
 
 		// Output paths setup
