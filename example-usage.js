@@ -211,8 +211,8 @@ void async function main ()
 	const palianswersScraper = await palianswers( true );
 	const decolonizepalestineScraper = await decolonizepalestine( true );
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
-	const bdsmovementScraper = await bdsmovement( false );
 	const electronicintifadaScraper = await electronicintifada( true );
+	const bdsmovementScraper = await bdsmovement( false );
 	const palestinerememberedScraper = await palestineremembered( false );
 
 	await WebScraper.combineResults( "./dataset/combined", [
@@ -225,4 +225,5 @@ void async function main ()
 	] );
 
 	// 7 https://stand-with-palestine.org/blogs
+	// https://mondoweiss.net
 }()
