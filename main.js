@@ -711,9 +711,9 @@ class WebScraper
 		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
 
-	static sleep ( ms )
+	static async sleep ( ms )
 	{
-		return new Promise( resolve => { return setTimeout( resolve, ms ) });
+		return await new Promise( resolve => { return setTimeout( resolve, ms ) });
 	}
 
 	static async combineResults ( outputPath, websites )
