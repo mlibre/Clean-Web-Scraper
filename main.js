@@ -11,15 +11,16 @@ class WebScraper
 		// Base configuration
 		baseURL,
 		startURL,
-		strictBaseURL = true,
-		maxDepth = Infinity,
-		maxArticles = Infinity,
+		strictBaseURL,
+		maxDepth,
+		maxArticles,
+		concurrencyLimit,
 
 		// URL filtering
 		excludeList = [],
 		exactExcludeList = [],
-		filterFileTypes = true,
-		excludedFileTypes = [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"],
+		filterFileTypes,
+		excludedFileTypes,
 
 		// Output paths
 		scrapResultPath = "./dataset",
@@ -45,9 +46,10 @@ class WebScraper
 		// Base configuration
 		this.baseURL = baseURL;
 		this.startURL = startURL || baseURL;
-		this.strictBaseURL = strictBaseURL;
-		this.maxDepth = maxDepth;
-		this.maxArticles = maxArticles;
+		this.strictBaseURL = strictBaseURL || true;
+		this.maxDepth = maxDepth || Infinity;
+		this.maxArticles = maxArticles || Infinity;
+		this.concurrencyLimit = concurrencyLimit || 10;
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
@@ -65,8 +67,8 @@ class WebScraper
 		this.visited = new Set();
 		this.excludeList = this.normalizeExcludeList( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
-		this.filterFileTypes = filterFileTypes;
-		this.excludedFileTypes = excludedFileTypes;
+		this.filterFileTypes = filterFileTypes || true;
+		this.excludedFileTypes = excludedFileTypes || [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"];
 
 		// Network configuration
 		this.axiosHeaders = axiosHeaders;
@@ -130,6 +132,11 @@ class WebScraper
 			console.log( `Reached maximum: ${this.maxArticles}, ${this.maxDepth}` );
 			return;
 		}
+		if ( this.visited.has( url ) )
+		{
+			console.log( `Already visited: ${url}` );
+			return;
+		}
 		this.visited.add( url );
 		if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
 		{
@@ -167,12 +174,20 @@ class WebScraper
 			}
 
 			const links = this.extractLinks( data );
-			for ( const link of links )
+			const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
+
+			for ( let i = 0; i < unvisitedLinks.length; i += this.concurrencyLimit )
 			{
-				if ( !this.visited.has( link ) )
+				const batch = unvisitedLinks.slice( i, i + this.concurrencyLimit );
+				const results = await Promise.allSettled( batch.map( link => { return this.fetchPage( link, depth + 1 ) }) );
+
+				results.forEach( ( result, index ) =>
 				{
-					await this.fetchPage( link, depth + 1 );
-				}
+					if ( result.status === "rejected" )
+					{
+						console.error( `Failed to fetch ${batch[index]}: ${result.reason}` );
+					}
+				});
 			}
 		}
 		catch ( error )
@@ -185,7 +200,7 @@ class WebScraper
 	{
 		try
 		{
-			const response = await retryAxiosRequest( url )
+			const response = await this.retryAxiosRequest( url )
 			const contentType = response.headers["content-type"] || "";
 			if ( !contentType.startsWith( "text" ) )
 			{
@@ -547,7 +562,7 @@ class WebScraper
 			{
 				if ( attempt === maxRetries ) throw error;
 				await WebScraper.sleep( 1000 * attempt );
-				console.log( `Retrying request to ${url} (Attempt ${attempt + 1}/${maxRetries})` );
+				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${maxRetries})` );
 			}
 		}
 	}
