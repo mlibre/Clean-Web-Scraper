@@ -8,8 +8,36 @@ const WebScraper = require( "./src/WebScraper" );
 // 	"Cookie": cookies
 // }
 
+async function palianswers ( enable )
+{
+	const scraper = new WebScraper({
+		baseURL: "https://palianswers.com",
+		excludeList: [
+			"https://palianswers.com/chat/",
+			"https://palianswers.com/become-a-volunteer/",
+			"https://palianswers.com/other-resources/",
+			"https://palianswers.com/request-a-rebuttal/",
+			"https://palianswers.com/submit-a-rebuttal/",
+			"https://palianswers.com/themes/"
+		],
+		exactExcludeList: [
+			"https://palianswers.com/",
+		],
+		scrapResultPath: "./dataset/palianswers/website",
+		jsonlOutputPath: "./dataset/palianswers/train.jsonl",
+		textOutputPath: "./dataset/palianswers/texts",
+		csvOutputPath: "./dataset/palianswers/train.csv",
+		includeMetadata: true,
+		metadataFields: ["title", "description", "author"]
+	});
+	if ( enable )
+	{
+		await scraper.start();
+	}
+	return scraper;
+}
 
-async function khameneiIrFreePalestineTag ()
+async function khameneiIrFreePalestineTag ( enable )
 {
 	// https://english.khamenei.ir/Opinions/FreePalestine
 	// https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#
@@ -135,6 +163,7 @@ async function electronicintifada ( enable )
 
 async function palestineremembered ( enable )
 {
+	// https://www.palestineremembered.com
 	const scraper = new WebScraper({
 		baseURL: "https://www.palestineremembered.com",
 		startURL: "https://www.palestineremembered.com/ZionistFAQ.html",
@@ -179,24 +208,21 @@ async function palestineremembered ( enable )
 
 void async function main ()
 {
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( false );
-	const decolonizepalestineScraper = await decolonizepalestine( false );
+	const palianswersScraper = await palianswers( true );
+	const decolonizepalestineScraper = await decolonizepalestine( true );
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
 	const bdsmovementScraper = await bdsmovement( false );
-	const electronicintifadaScraper = await electronicintifada( false );
-	  const palestinerememberedScraper = await palestineremembered( true );
+	const electronicintifadaScraper = await electronicintifada( true );
+	const palestinerememberedScraper = await palestineremembered( false );
+
 	await WebScraper.combineResults( "./dataset/combined", [
-		khameneiIrFreePalestineTagScraper,
+		palianswersScraper,
 		decolonizepalestineScraper,
-		bdsmovementScraper,
+		khameneiIrFreePalestineTagScraper,
 		electronicintifadaScraper,
-		palestinerememberedScraper
+		// bdsmovementScraper,
+		// palestinerememberedScraper,
 	] );
-
-	// 5
-	// https://www.palestineremembered.com/ZionistFAQ.html
-
-	// 6 https://the-palestinian-side.vercel.app/
 
 	// 7 https://stand-with-palestine.org/blogs
 }()
-

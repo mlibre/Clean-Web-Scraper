@@ -12,8 +12,9 @@ class WebScraper
 	constructor ({
 		baseURL,
 		startURL,
+		strictBaseURL = true,
 		maxDepth = Infinity,
-		maxArticles = Infinity, // Add this line
+		maxArticles = Infinity,
 		excludeList,
 		exactExcludeList,
 		scrapResultPath = "./dataset",
@@ -34,8 +35,9 @@ class WebScraper
 	{
 		this.baseURL = baseURL;
 		this.startURL = startURL || baseURL;
+		this.strictBaseURL = strictBaseURL;
 		this.maxDepth = maxDepth;
-		this.maxArticles = maxArticles; // Add this line
+		this.maxArticles = maxArticles;
 		this.scrapResultPath = scrapResultPath;
 		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
@@ -128,6 +130,10 @@ class WebScraper
 		}
 		this.visited.add( url );
 		if ( !this.isValidFileType( url ) )
+		{
+			return;
+		}
+		if ( !this.isValidDomain( url ) )
 		{
 			return;
 		}
@@ -606,6 +612,22 @@ class WebScraper
 		if ( !this.filterFileTypes ) return true;
 		const urlPath = new URL( url ).pathname.toLowerCase();
 		return !this.excludedFileTypes.some( ext => { return urlPath.endsWith( ext ) });
+	}
+
+	isValidDomain ( url )
+	{
+		if ( !this.strictBaseURL ) return true;
+		try
+		{
+			const urlObj = new URL( url );
+			const baseURLObj = new URL( this.baseURL );
+			return urlObj.hostname === baseURLObj.hostname;
+		}
+		catch ( e )
+		{
+			console.log( `Invalid URL: ${url}` );
+			return false;
+		}
 	}
 
 	isValidContent ( content )
