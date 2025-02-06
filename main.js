@@ -51,7 +51,7 @@ class WebScraper
 		this.maxDepth = maxDepth || Infinity;
 		this.maxArticles = maxArticles || Infinity;
 		this.concurrencyLimit = concurrencyLimit || 2;
-		this.maxRetries = maxRetries || 20;
+		this.maxRetries = maxRetries || 5;
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
@@ -181,7 +181,7 @@ class WebScraper
 
 			for ( let i = 0; i < unvisitedLinks.length; i += this.concurrencyLimit )
 			{
-				await WebScraper.sleep( 2000 );
+				await WebScraper.sleep( 5000 );
 				const batch = unvisitedLinks.slice( i, i + this.concurrencyLimit );
 				const results = await Promise.allSettled( batch.map( link => { return this.fetchPage( link, depth + 1 ) }) );
 
@@ -564,7 +564,7 @@ class WebScraper
 			catch ( error )
 			{
 				if ( attempt === this.maxRetries ) throw error;
-				await WebScraper.sleep( 10000 * attempt );
+				await WebScraper.sleep( 40000 * attempt );
 				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.maxRetries})`, error.message, error.code );
 			}
 		}
