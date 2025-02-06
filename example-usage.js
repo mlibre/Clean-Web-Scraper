@@ -1,4 +1,4 @@
-const WebScraper = require( "./src/WebScraper" );
+const WebScraper = require( "./main" );
 
 // const cookies = "cf_clearance=ENHJkpw.ycd1tZ_A.d0O27QdslTN0EHaNurhCznfimg-1738241402-1.2.1.1-BlO.WitkGwE3U3vSamX35xP.AgN1HyvHWL03Jhe.twbn4QWojiw1T4.0M4lE_TcIeZrQ6ErwV9kQBMBKmfU0S6lQth1BJx7UpWn4T6wtFm83LmF.cB13PQYSQgGFGsH7qOkGIjbBhMbceQNp.y2XZgLq_hdntGKSBMe0iCUotx_xsqlzkolQIqnUYID3BLEQXZqNvqJOwkzLZ7.kzrwP42VdEuWEvT4jt7F3TkTaU9rumAp8FSNO1.hnr76Tv23OITm17rPD3__Ghdu1D0E.4v693nEiVYO_KQYNf_8gk0vXP.KAvUKA2zQyBmDXkfW3M1MkoLjFNZCanx9FPRVO7g";
 // const headers = {
@@ -28,7 +28,7 @@ async function palianswers ( enable )
 		textOutputPath: "./dataset/palianswers/texts",
 		csvOutputPath: "./dataset/palianswers/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author"]
+		metadataFields: ["author", "title", "description"]
 	});
 	if ( enable )
 	{
@@ -53,7 +53,7 @@ async function khameneiIrFreePalestineTag ( enable )
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author"]
+		metadataFields: ["author", "title", "description"]
 	});
 	if ( enable )
 	{
@@ -82,7 +82,7 @@ async function decolonizepalestine ( enable )
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author"]
+		metadataFields: ["author", "title", "description"]
 	});
 	if ( enable )
 	{
@@ -108,7 +108,7 @@ async function bdsmovement ( enable )
 		textOutputPath: "./dataset/bdsmovement/texts",
 		csvOutputPath: "./dataset/bdsmovement/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author"],
+		metadataFields: ["author", "title", "description"],
 		puppeteerProxy: "socks5://127.0.0.1:2080",
 		puppeteerExecutablePath: "/usr/bin/chromium",
 		puppeteerRealProxy: {
@@ -152,7 +152,7 @@ async function electronicintifada ( enable )
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
 		maxArticles: 2000,
-		metadataFields: ["title", "description", "author"]
+		metadataFields: ["author", "title", "description"]
 	});
 	if ( enable )
 	{
@@ -191,7 +191,7 @@ async function palestineremembered ( enable )
 		textOutputPath: "./dataset/palestineremembered/texts",
 		csvOutputPath: "./dataset/palestineremembered/train.csv",
 		includeMetadata: true,
-		metadataFields: ["title", "description", "author"],
+		metadataFields: ["author", "title", "description"],
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
