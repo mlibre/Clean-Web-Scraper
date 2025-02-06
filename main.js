@@ -551,7 +551,7 @@ class WebScraper
 			...this.axiosOptions,
 		};
 
-		let maxRetries = 3;
+		let maxRetries = 10;
 		for ( let attempt = 1; attempt <= maxRetries; attempt++ )
 		{
 			try
@@ -561,7 +561,7 @@ class WebScraper
 			catch ( error )
 			{
 				if ( attempt === maxRetries ) throw error;
-				await WebScraper.sleep( 1000 * attempt );
+				await WebScraper.sleep( 4000 * attempt );
 				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${maxRetries})` );
 			}
 		}
