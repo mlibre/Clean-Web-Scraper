@@ -15,6 +15,7 @@ class WebScraper
 		maxDepth,
 		maxArticles,
 		concurrencyLimit,
+		maxRetries,
 
 		// URL filtering
 		excludeList = [],
@@ -50,6 +51,7 @@ class WebScraper
 		this.maxDepth = maxDepth || Infinity;
 		this.maxArticles = maxArticles || Infinity;
 		this.concurrencyLimit = concurrencyLimit || 7;
+		this.maxRetries = maxRetries || 15;
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
@@ -551,8 +553,7 @@ class WebScraper
 			...this.axiosOptions,
 		};
 
-		let maxRetries = 11;
-		for ( let attempt = 1; attempt <= maxRetries; attempt++ )
+		for ( let attempt = 1; attempt <= this.maxRetries; attempt++ )
 		{
 			try
 			{
@@ -560,9 +561,9 @@ class WebScraper
 			}
 			catch ( error )
 			{
-				if ( attempt === maxRetries ) throw error;
-				await WebScraper.sleep( 5000 * attempt );
-				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${maxRetries})`, error.message, error.code );
+				if ( attempt === this.maxRetries ) throw error;
+				await WebScraper.sleep( 6000 * attempt );
+				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.maxRetries})`, error.message, error.code );
 			}
 		}
 	}
