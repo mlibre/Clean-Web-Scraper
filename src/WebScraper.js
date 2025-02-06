@@ -76,11 +76,11 @@ class WebScraper
 		this.axiosOptions = {};
 		if ( this.axiosHeaders )
 		{
-			axiosOptions.headers = this.axiosHeaders;
+			this.axiosOptions.headers = this.axiosHeaders;
 		}
 		if ( this.axiosProxy )
 		{
-			axiosOptions.proxy = this.axiosProxy;
+			this.axiosOptions.proxy = this.axiosProxy;
 		}
 
 		// Content storage
@@ -195,7 +195,7 @@ class WebScraper
 				responseType: "stream",
 				maxRedirects: 5,
 				timeout: 70000,
-				...axiosOptions,
+				...this.axiosOptions,
 			});
 
 			const contentType = response.headers["content-type"] || "";
