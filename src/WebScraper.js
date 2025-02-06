@@ -10,80 +10,79 @@ const { connect } = require( "puppeteer-real-browser" )
 class WebScraper
 {
 	constructor ({
+		// Base configuration
 		baseURL,
 		startURL,
 		strictBaseURL = true,
 		maxDepth = Infinity,
 		maxArticles = Infinity,
-		excludeList,
-		exactExcludeList,
+
+		// URL filtering
+		excludeList = [],
+		exactExcludeList = [],
+		filterFileTypes = true,
+		excludedFileTypes = [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"],
+
+		// Output paths
 		scrapResultPath = "./dataset",
 		jsonlOutputPath,
 		textOutputPath,
 		csvOutputPath,
+
+		// Metadata options
 		includeMetadata = false,
-		metadataFields = [], // ['title', 'description', 'author', etc.]
+		metadataFields = [],
+
+		// Network options
 		axiosHeaders,
 		axiosProxy,
+
+		// Puppeteer options
 		usePuppeteer,
 		puppeteerProxy, // e.g. http://127.0.0.1:2080
 		puppeteerExecutablePath,
-		puppeteerRealProxy,
-		filterFileTypes = true,
-		excludedFileTypes = [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"]
+		puppeteerRealProxy
 	})
 	{
+		// Base configuration
 		this.baseURL = baseURL;
 		this.startURL = startURL || baseURL;
 		this.strictBaseURL = strictBaseURL;
 		this.maxDepth = maxDepth;
 		this.maxArticles = maxArticles;
+
+		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
 		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
 		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
-		this.jsonlOutputPathWithMeta = jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
-		this.csvOutputPathWithMeta = csvOutputPath.replace( ".csv", "_with_metadata.csv" );
-		this.axiosHeaders = axiosHeaders;
+		this.jsonlOutputPathWithMeta = this.jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
+		this.csvOutputPathWithMeta = this.csvOutputPath.replace( ".csv", "_with_metadata.csv" );
+
+		// Metadata configuration
 		this.includeMetadata = includeMetadata;
-	   this.metadataFields = new Set( metadataFields );
+		this.metadataFields = new Set( metadataFields );
+
+		// URL filtering setup
 		this.visited = new Set();
 		this.excludeList = this.normalizeExcludeList( excludeList );
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
-		this.allProcessedContent = [];
 		this.filterFileTypes = filterFileTypes;
 		this.excludedFileTypes = excludedFileTypes;
+
+		// Network configuration
+		this.axiosHeaders = axiosHeaders;
 		this.axiosProxy = axiosProxy;
+
+		// Content storage
+		this.allProcessedContent = [];
+
+		// Puppeteer configuration
 		this.usePuppeteer = usePuppeteer || false;
-		this.puppeteerOptions = {
-			headless: false,
-			userDataDir: "./tmp/browser",
-			defaultViewport: null,
-			args: [
-				"--start-maximized"
-			],
-			"ignoreDefaultArgs": true,
-		}
-		if ( puppeteerProxy )
-		{
-			this.puppeteerOptions.args.push( `--proxy-server=${puppeteerProxy}` );
-		}
-		if ( puppeteerExecutablePath )
-		{
-			this.puppeteerOptions.executablePath = puppeteerExecutablePath;
-		}
-		this.puppeteerRealOptions = {
-			headless: false,
-			args: [],
-			customConfig: {},
-			turnstile: true,
-			connectOption: {},
-			disableXvfb: false,
-			ignoreAllFlags: false,
-			proxy: puppeteerRealProxy
-		}
-		this.puppeteerBrowser = null;
-		this.puppeteerPage = null;
+		this.puppeteerProxy = puppeteerProxy;
+		this.puppeteerExecutablePath = puppeteerExecutablePath;
+		this.puppeteerRealProxy = puppeteerRealProxy;
+		this.configurePuppeteer( );
 	}
 
 	async start ()
@@ -549,6 +548,41 @@ class WebScraper
 		};
 	}
 
+	configurePuppeteer ( )
+	{
+		this.puppeteerOptions = {
+			headless: false,
+			userDataDir: "./tmp/browser",
+			defaultViewport: null,
+			args: ["--start-maximized"],
+			ignoreDefaultArgs: true
+		};
+
+		if ( this.puppeteerProxy )
+		{
+			this.puppeteerOptions.args.push( `--proxy-server=${this.puppeteerProxy}` );
+		}
+
+		if ( this.puppeteerExecutablePath )
+		{
+			this.puppeteerOptions.executablePath = this.puppeteerExecutablePath;
+		}
+
+		this.puppeteerRealOptions = {
+			headless: false,
+			args: [],
+			customConfig: {},
+			turnstile: true,
+			connectOption: {},
+			disableXvfb: false,
+			ignoreAllFlags: false,
+			proxy: this.puppeteerRealProxy
+		};
+
+		this.puppeteerBrowser = null;
+		this.puppeteerPage = null;
+	}
+
 	normalizeExcludeList ( list = [] )
 	{
 		const normalizedSet = new Set();
@@ -575,36 +609,6 @@ class WebScraper
 			return true;
 		}
 		return Array.from( this.excludeList ).some( excluded => { return url.startsWith( excluded ) });
-	}
-
-	createOutputDirectory ()
-	{
-		if ( fs.existsSync( path.join( __dirname, this.scrapResultPath ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.scrapResultPath ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.textOutputPath ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.textOutputPath ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.csvOutputPath ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.csvOutputPath ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.csvOutputPathWithMeta ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.csvOutputPathWithMeta ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPath ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.jsonlOutputPath ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPathWithMeta ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.jsonlOutputPathWithMeta ), { recursive: true, force: true });
-		}
-		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
-		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
 
 	isValidFileType ( url )
@@ -655,6 +659,36 @@ class WebScraper
 			return false;
 		}
 		return true;
+	}
+
+	createOutputDirectory ()
+	{
+		if ( fs.existsSync( path.join( __dirname, this.scrapResultPath ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.scrapResultPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.textOutputPath ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.textOutputPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.csvOutputPath ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.csvOutputPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.csvOutputPathWithMeta ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.csvOutputPathWithMeta ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPath ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.jsonlOutputPath ), { recursive: true, force: true });
+		}
+		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPathWithMeta ) ) )
+		{
+			fs.rmSync( path.join( __dirname, this.jsonlOutputPathWithMeta ), { recursive: true, force: true });
+		}
+		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
+		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
 	}
 
 	static sleep ( ms )
