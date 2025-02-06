@@ -208,8 +208,8 @@ class WebScraper
 		try
 		{
 			const response = await this.retryAxiosRequest( url )
-			const contentType = response.headers["content-type"] || "";
-			if ( !contentType.startsWith( "text" ) )
+			const contentType = response?.headers["content-type"] || "";
+			if ( !contentType?.startsWith( "text" ) )
 			{
 				console.log( `Skipping non-HTML content for ${url}: Content-Type is ${contentType}` );
 				response.data.destroy();
@@ -572,15 +572,20 @@ class WebScraper
 		{
 			try
 			{
+				if ( this.hasReachedMax( depth ) )
+				{
+					throw new Error( "Max reached" );
+				}
 				return await axios.get( url, options );
 			}
 			catch ( error )
 			{
-				if ( attempt === this.maxRetries ) throw error;
+				if ( attempt >= this.maxRetries ) throw error;
 				await WebScraper.sleep( 40000 * attempt );
 				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.maxRetries})`, error.message, error.code );
 			}
 		}
+		throw new Error( "Max retries reached" );
 	}
 
 	configurePuppeteer ( )
