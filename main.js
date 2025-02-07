@@ -16,6 +16,7 @@ class WebScraper
 		maxArticles,
 		concurrencyLimit,
 		maxRetries,
+		retryDelay,
 
 		// URL filtering
 		excludeList = [],
@@ -53,6 +54,7 @@ class WebScraper
 		this.maxArticles = maxArticles || Infinity;
 		this.concurrencyLimit = concurrencyLimit || 2;
 		this.maxRetries = maxRetries || 5;
+		this.retryDelay = retryDelay || 40000;
 
 		// Output paths setup
 		this.scrapResultPath = scrapResultPath;
@@ -357,6 +359,10 @@ class WebScraper
 		{
 			urlPath = "/index";
 		}
+		else if ( urlPath.endsWith( "/" ) )
+		{
+			urlPath = urlPath.slice( 0, -1 );
+		}
 		const filePath = path.join( __dirname, this.scrapResultPath, urlPath );
 		const dir = path.dirname( filePath );
 
@@ -586,7 +592,7 @@ class WebScraper
 			catch ( error )
 			{
 				if ( attempt >= this.maxRetries ) throw error;
-				await WebScraper.sleep( 40000 * attempt );
+				await WebScraper.sleep( this.retryDelay * attempt );
 				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.maxRetries})`, error.message, error.code );
 			}
 		}

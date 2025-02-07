@@ -29,7 +29,8 @@ async function palianswers ( enable )
 		textOutputPath: "./dataset/palianswers/texts",
 		csvOutputPath: "./dataset/palianswers/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"]
+		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		retryDelay: 10000
 	});
 	if ( enable )
 	{
@@ -54,7 +55,8 @@ async function khameneiIrFreePalestineTag ( enable )
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"]
+		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		retryDelay: 10000
 	});
 	if ( enable )
 	{
@@ -84,40 +86,8 @@ async function decolonizepalestine ( enable )
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"]
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
-}
-
-async function bdsmovement ( enable )
-{
-	// https://bdsmovement.net
-	const scraper = new WebScraper({
-		baseURL: "https://bdsmovement.net",
-		excludeList: [
-			"https://bdsmovement.net/press-area",
-			"https://bdsmovement.net/privacy-policy",
-			"https://bdsmovement.net/get-involved/join-a-bds-campaign",
-			"https://bdsmovement.net/donate_",
-			"https://bdsmovement.net/user",
-			"https://bdsmovement.net/admin"
-		],
-		scrapResultPath: "./dataset/bdsmovement/website",
-		jsonlOutputPath: "./dataset/bdsmovement/train.jsonl",
-		textOutputPath: "./dataset/bdsmovement/texts",
-		csvOutputPath: "./dataset/bdsmovement/train.csv",
-		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		puppeteerProxy: "socks5://127.0.0.1:2080",
-		puppeteerExecutablePath: "/usr/bin/chromium",
-		puppeteerRealProxy: {
-			host: "socks5://127.0.0.1",
-			port: "2080",
-		},
+		retryDelay: 10000
 	});
 	if ( enable )
 	{
@@ -155,53 +125,11 @@ async function electronicintifada ( enable )
 		textOutputPath: "./dataset/electronicintifada/texts",
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
+		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		maxDepth: 10,
 		maxArticles: 2000,
 		axiosHeaders: headers,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"]
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
-}
-
-async function palestineremembered ( enable )
-{
-	// https://www.palestineremembered.com
-	const scraper = new WebScraper({
-		baseURL: "https://www.palestineremembered.com",
-		startURL: "https://www.palestineremembered.com/ZionistFAQ.html",
-		excludeList: [
-			"https://www.palestineremembered.com/GeoPoints",
-			"https://www.palestineremembered.com/Donate",
-			"https://www.palestineremembered.com/ContactUs.html",
-			"https://www.palestineremembered.com/tags/Looting-Palestinian-properties.html",
-			"https://www.palestineremembered.com/ar/",
-			"https://www.palestineremembered.com/OldNewPictures.html",
-			"https://www.palestineremembered.com/Maps/index.html",
-			"https://www.palestineremembered.com/OralHistory/Interviews-Listing/",
-			"https://www.palestineremembered.com/Acre/Famous-Zionist-Quotes/Story637.html",
-			"https://www.palestineremembered.com/Articles/General/Story2045.html",
-			"https://www.palestineremembered.com/AllTownsListing.html",
-			"https://www.palestineremembered.com/Articles/General/ar/",
-			"https://www.palestineremembered.com/SiteVideos.html"
-		],
-		exactExcludeList: [
-			"https://www.palestineremembered.com/index.html",
-			"https://www.palestineremembered.com/ZionistFAQ.html"
-		],
-		scrapResultPath: "./dataset/palestineremembered/website",
-		jsonlOutputPath: "./dataset/palestineremembered/train.jsonl",
-		textOutputPath: "./dataset/palestineremembered/texts",
-		csvOutputPath: "./dataset/palestineremembered/train.csv",
-		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		axiosProxy: {
-			host: "localhost",
-			port: 2080,
-			protocol: "http"
-		}
+		retryDelay: 10000
 	});
 	if ( enable )
 	{
@@ -259,7 +187,6 @@ async function mondoweiss ( enable )
 		jsonlOutputPath: "./dataset/mondoweiss/train.jsonl",
 		textOutputPath: "./dataset/mondoweiss/texts",
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
-		includeMetadata: true,
 		maxArticles: 2500,
 		maxRetries: 2,
 		axiosHeaders: headers,
@@ -268,6 +195,9 @@ async function mondoweiss ( enable )
 			port: 2080,
 			protocol: "http"
 		},
+		maxDepth: 10,
+		retryDelay: 10000,
+		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"]
 	});
 	if ( enable )
@@ -277,6 +207,82 @@ async function mondoweiss ( enable )
 	return scraper;
 }
 
+async function bdsmovement ( enable )
+{
+	// https://bdsmovement.net
+	const scraper = new WebScraper({
+		baseURL: "https://bdsmovement.net",
+		excludeList: [
+			"https://bdsmovement.net/press-area",
+			"https://bdsmovement.net/privacy-policy",
+			"https://bdsmovement.net/get-involved/join-a-bds-campaign",
+			"https://bdsmovement.net/donate_",
+			"https://bdsmovement.net/user",
+			"https://bdsmovement.net/admin"
+		],
+		scrapResultPath: "./dataset/bdsmovement/website",
+		jsonlOutputPath: "./dataset/bdsmovement/train.jsonl",
+		textOutputPath: "./dataset/bdsmovement/texts",
+		csvOutputPath: "./dataset/bdsmovement/train.csv",
+		includeMetadata: true,
+		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		puppeteerProxy: "socks5://127.0.0.1:2080",
+		puppeteerExecutablePath: "/usr/bin/chromium",
+		puppeteerRealProxy: {
+			host: "socks5://127.0.0.1",
+			port: "2080",
+		},
+	});
+	if ( enable )
+	{
+		await scraper.start();
+	}
+	return scraper;
+}
+
+async function palestineremembered ( enable )
+{
+	// https://www.palestineremembered.com
+	const scraper = new WebScraper({
+		baseURL: "https://www.palestineremembered.com",
+		startURL: "https://www.palestineremembered.com/ZionistFAQ.html",
+		excludeList: [
+			"https://www.palestineremembered.com/GeoPoints",
+			"https://www.palestineremembered.com/Donate",
+			"https://www.palestineremembered.com/ContactUs.html",
+			"https://www.palestineremembered.com/tags/Looting-Palestinian-properties.html",
+			"https://www.palestineremembered.com/ar/",
+			"https://www.palestineremembered.com/OldNewPictures.html",
+			"https://www.palestineremembered.com/Maps/index.html",
+			"https://www.palestineremembered.com/OralHistory/Interviews-Listing/",
+			"https://www.palestineremembered.com/Acre/Famous-Zionist-Quotes/Story637.html",
+			"https://www.palestineremembered.com/Articles/General/Story2045.html",
+			"https://www.palestineremembered.com/AllTownsListing.html",
+			"https://www.palestineremembered.com/Articles/General/ar/",
+			"https://www.palestineremembered.com/SiteVideos.html"
+		],
+		exactExcludeList: [
+			"https://www.palestineremembered.com/index.html",
+			"https://www.palestineremembered.com/ZionistFAQ.html"
+		],
+		scrapResultPath: "./dataset/palestineremembered/website",
+		jsonlOutputPath: "./dataset/palestineremembered/train.jsonl",
+		textOutputPath: "./dataset/palestineremembered/texts",
+		csvOutputPath: "./dataset/palestineremembered/train.csv",
+		includeMetadata: true,
+		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		axiosProxy: {
+			host: "localhost",
+			port: 2080,
+			protocol: "http"
+		}
+	});
+	if ( enable )
+	{
+		await scraper.start();
+	}
+	return scraper;
+}
 
 void async function main ()
 {
