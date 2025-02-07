@@ -240,7 +240,20 @@ async function mondoweiss ( enable )
 			"https://mondoweiss.net/donate",
 			"https://mondoweiss.net/advertise/",
 			"https://mondoweiss.net/contact/",
-			"https://mondoweiss.net/recent-comments/"
+			"https://mondoweiss.net/recent-comments/",
+			"https://mondoweiss.net/email-newsletters",
+			"https://mondoweiss.net/author",
+			"https://mondoweiss.net/tag/"
+		],
+		exactExcludeList: [
+			"https://mondoweiss.net",
+			"https://mondoweiss.net/news/",
+			"https://mondoweiss.net/opinion/",
+			"https://mondoweiss.net/ways-to-give/",
+			"https://mondoweiss.net/media-analysis/",
+			"https://mondoweiss.net/culture/",
+			"https://mondoweiss.net/activism/",
+			"https://mondoweiss.net/news-letters/"
 		],
 		scrapResultPath: "./dataset/mondoweiss/website",
 		jsonlOutputPath: "./dataset/mondoweiss/train.jsonl",
@@ -248,7 +261,13 @@ async function mondoweiss ( enable )
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		includeMetadata: true,
 		maxArticles: 2500,
+		maxRetries: 2,
 		axiosHeaders: headers,
+		axiosProxy: {
+			host: "localhost",
+			port: 2080,
+			protocol: "http"
+		},
 		metadataFields: ["author", "title", "description", "dateScrapedDate"]
 	});
 	if ( enable )
@@ -261,11 +280,11 @@ async function mondoweiss ( enable )
 
 void async function main ()
 {
-	const palianswersScraper = await palianswers( false );
-	const decolonizepalestineScraper = await decolonizepalestine( false );
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( false );
-	const electronicintifadaScraper = await electronicintifada( false );
-	const standWithPalestineScraper = await standWithPalestine( false );
+	const palianswersScraper = await palianswers( true );
+	const decolonizepalestineScraper = await decolonizepalestine( true );
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
+	const electronicintifadaScraper = await electronicintifada( true );
+	const standWithPalestineScraper = await standWithPalestine( true );
 	const mondoweisScraper = await mondoweiss( true );
 	const bdsmovementScraper = await bdsmovement( false );
 	const palestinerememberedScraper = await palestineremembered( false );
@@ -279,6 +298,3 @@ void async function main ()
 		mondoweisScraper
 	] );
 }()
-
-
-// https://mondoweiss.net
