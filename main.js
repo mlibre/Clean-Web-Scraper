@@ -161,7 +161,6 @@ class WebScraper
 					if ( this.hasValidPageContent( article.textContent ) )
 					{
 						const metadata = this.extractMetadata( url, document );
-						metadata.depth = depth;
 						this.saveArticle( url, article.textContent, metadata );
 					}
 					else
@@ -262,7 +261,7 @@ class WebScraper
 		}
 	}
 
-	hasReachedMax ( depth )
+	hasReachedMax ( depth = 0 )
 	{
 		if ( this.allProcessedContent.length >= this.maxArticles || depth > this.maxDepth )
 		{
@@ -555,7 +554,7 @@ class WebScraper
 			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )?.content,
 			ogImage: document.querySelector( "meta[property=\"og:image\"]" )?.content,
 			ogType: document.querySelector( "meta[property=\"og:type\"]" )?.content,
-			dateScraped: new Date().toISOString()
+			dateScrapedDate: new Date().toISOString()
 		};
 	}
 
@@ -572,7 +571,7 @@ class WebScraper
 		{
 			try
 			{
-				if ( this.hasReachedMax( depth ) )
+				if ( this.hasReachedMax( ) )
 				{
 					throw new Error( "Max reached" );
 				}
