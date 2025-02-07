@@ -22,6 +22,7 @@ class WebScraper
 		exactExcludeList = [],
 		filterFileTypes,
 		excludedFileTypes,
+		removeURLFragment,
 
 		// Output paths
 		scrapResultPath = "./dataset",
@@ -72,6 +73,7 @@ class WebScraper
 		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
 		this.filterFileTypes = filterFileTypes || true;
 		this.excludedFileTypes = excludedFileTypes || [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"];
+		this.removeURLFragment = removeURLFragment || true;
 
 		// Network configuration
 		this.axiosHeaders = axiosHeaders;
@@ -130,6 +132,10 @@ class WebScraper
 
 	async fetchPage ( url, depth )
 	{
+		if ( this.removeURLFragment )
+		{
+			url = url.split( "#" )[0];
+		}
 		if ( this.hasReachedMax( depth ) )
 		{
 			return;
@@ -233,7 +239,7 @@ class WebScraper
 		}
 		catch ( error )
 		{
-			console.error( `Error fetching ${url}:`, error.message );
+			console.error( `Error fetching content ${url}:`, error.message );
 			if ( error.status = 403 && this.usePuppeteer )
 			{
 				try
