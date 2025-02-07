@@ -585,7 +585,7 @@ class WebScraper
 			{
 				if ( this.hasReachedMax( ) )
 				{
-					throw new Error( "Max reached" );
+					break;
 				}
 				return await axios.get( url, options );
 			}

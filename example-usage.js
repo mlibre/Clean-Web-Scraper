@@ -128,6 +128,7 @@ async function electronicintifada ( enable )
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		maxDepth: 10,
 		maxArticles: 2000,
+		concurrencyLimit: 4,
 		axiosHeaders: headers,
 		retryDelay: 10000
 	});
@@ -189,6 +190,7 @@ async function mondoweiss ( enable )
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		maxArticles: 2500,
 		maxRetries: 2,
+		concurrencyLimit: 4,
 		axiosHeaders: headers,
 		axiosProxy: {
 			host: "localhost",
