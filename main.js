@@ -577,7 +577,7 @@ class WebScraper
 		let options = {
 			responseType: "stream",
 			maxRedirects: 5,
-			timeout: 20000,
+			timeout: 30000,
 			...this.axiosOptions,
 		};
 
