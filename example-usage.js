@@ -129,9 +129,9 @@ async function electronicintifada ( enable )
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		maxDepth: 10,
+		maxDepth: 12,
 		maxArticles: 2000,
-		concurrencyLimit: 4,
+		concurrencyLimit: 3,
 		axiosHeaders: headers,
 		retryDelay: 10000
 	});
