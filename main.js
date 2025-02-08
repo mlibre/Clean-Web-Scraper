@@ -154,6 +154,7 @@ class WebScraper
 		}
 		try
 		{
+			await WebScraper.sleep( 5000 );
 			const data = await this.fetchContent( url );
 			if ( !data ) return;
 			const dom = new JSDOM( data, { url });
@@ -191,7 +192,6 @@ class WebScraper
 				{
 					return;
 				}
-				await WebScraper.sleep( 5000 );
 				const batch = unvisitedLinks.slice( i, i + this.concurrencyLimit );
 				const results = await Promise.allSettled( batch.map( link => { return this.fetchPage( link, depth + 1 ) }) );
 

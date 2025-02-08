@@ -30,7 +30,8 @@ async function palianswers ( enable )
 		csvOutputPath: "./dataset/palianswers/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		retryDelay: 10000
+		retryDelay: 10000,
+		concurrencyLimit: 4,
 	});
 	if ( enable )
 	{
@@ -56,7 +57,8 @@ async function khameneiIrFreePalestineTag ( enable )
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		retryDelay: 10000
+		retryDelay: 10000,
+		concurrencyLimit: 4,
 	});
 	if ( enable )
 	{
@@ -87,7 +89,8 @@ async function decolonizepalestine ( enable )
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		retryDelay: 10000
+		retryDelay: 10000,
+		concurrencyLimit: 4,
 	});
 	if ( enable )
 	{
