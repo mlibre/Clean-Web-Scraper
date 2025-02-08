@@ -38,6 +38,7 @@ class WebScraper
 		// Network options
 		axiosHeaders,
 		axiosProxy,
+		useProxyAsFallback,
 
 		// Puppeteer options
 		usePuppeteer,
@@ -80,6 +81,7 @@ class WebScraper
 		// Network configuration
 		this.axiosHeaders = axiosHeaders;
 		this.axiosProxy = axiosProxy;
+		this.useProxyAsFallback = useProxyAsFallback || false;
 		this.axiosOptions = {};
 		if ( this.axiosHeaders )
 		{
@@ -572,7 +574,7 @@ class WebScraper
 
 	async retryAxiosRequest ( url )
 	{
-		const options = {
+		let options = {
 			responseType: "stream",
 			maxRedirects: 5,
 			timeout: 20000,
@@ -587,6 +589,14 @@ class WebScraper
 				{
 					break;
 				}
+				if ( attempt === this.maxRetries && this.useProxyAsFallback && this.axiosProxy )
+				{
+					options = {
+						...options,
+						proxy: this.axiosProxy
+					};
+				}
+
 				return await axios.get( url, options );
 			}
 			catch ( error )

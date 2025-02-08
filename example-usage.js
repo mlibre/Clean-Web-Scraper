@@ -129,11 +129,17 @@ async function electronicintifada ( enable )
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		maxDepth: 12,
+		maxDepth: 13,
 		maxArticles: 2000,
 		concurrencyLimit: 3,
 		axiosHeaders: headers,
-		retryDelay: 10000
+		retryDelay: 10000,
+		axiosProxy: {
+			host: "localhost",
+			port: 2080,
+			protocol: "http"
+		},
+		useProxyAsFallback: true
 	});
 	if ( enable )
 	{
