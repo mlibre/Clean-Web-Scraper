@@ -129,9 +129,9 @@ async function electronicintifada ( enable )
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		maxDepth: 13,
+		maxDepth: 16,
 		maxArticles: 2000,
-		concurrencyLimit: 3,
+		concurrencyLimit: 2,
 		axiosHeaders: headers,
 		retryDelay: 10000,
 		axiosProxy: {
@@ -198,18 +198,19 @@ async function mondoweiss ( enable )
 		textOutputPath: "./dataset/mondoweiss/texts",
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		maxArticles: 2500,
-		maxRetries: 2,
-		concurrencyLimit: 4,
+		maxRetries: 3,
+		concurrencyLimit: 3,
 		axiosHeaders: headers,
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
 			protocol: "http"
 		},
-		maxDepth: 10,
+		maxDepth: 15,
 		retryDelay: 10000,
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"]
+		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		useProxyAsFallback: true
 	});
 	if ( enable )
 	{
