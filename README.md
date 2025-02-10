@@ -86,7 +86,8 @@ const docsScraper = new WebScraper({
   scrapResultPath: './datasets/docs',
   maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
   includeMetadata: true,                     // Optional: Include metadata in output files
-  metadataFields: ['title', 'description']   // Optional: Specify metadata fields to include
+  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
+   // Optional: Specify metadata fields to include
 });
 
 // Scrape blog website
@@ -95,7 +96,8 @@ const blogScraper = new WebScraper({
   scrapResultPath: './datasets/blog',
   maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
   includeMetadata: true,                     // Optional: Include metadata in output files
-  metadataFields: ['title', 'description']   // Optional: Specify metadata fields to include
+  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
+   // Optional: Specify metadata fields to include
 });
 
 // Start scraping both sites
@@ -165,7 +167,7 @@ The actual article content starts here. This is the clean, processed text of the
 ### 📑 Text Files with Metadata (texts_with_metadata/*.txt)
 
 ```text
-title: My Awesome Page
+articleTitle: My Awesome Page
 description: This is a great article about coding
 author: John Doe
 language: en
@@ -186,8 +188,8 @@ The actual article content starts here. This is the clean, processed text of the
 ### 📈 JSONL with Metadata (train_with_metadata.jsonl)
 
 ```json
-{"text": "Article content", "metadata": {"title": "Page Title", "author": "John Doe"}}
-{"text": "Another article", "metadata": {"title": "Second Page", "author": "Jane Smith"}}
+{"text": "Article content", "metadata": {"articleTitle": "Page Title", "author": "John Doe"}}
+{"text": "Another article", "metadata": {"articleTitle": "Second Page", "author": "Jane Smith"}}
 ```
 
 ### 🗃️ JSON Files In Website Output  (*.json)
@@ -212,7 +214,7 @@ text
 ### 📊 CSV with Metadata (train_with_metadata.csv)
 
 ```csv
-text,title,author,description
+text,articleTitle,author,description
 "Article content","Page Title","John Doe","Page description"
 "Another article","Second Page","Jane Smith","Another description"
 ```
