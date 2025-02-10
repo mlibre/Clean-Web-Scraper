@@ -10,41 +10,41 @@ class WebScraper
 	constructor ( config = {})
 	{
 		// Base configuration
-		this.baseURL = baseURL;
-		this.startURL = startURL || baseURL;
-		this.strictBaseURL = strictBaseURL || true;
-		this.maxDepth = maxDepth || Infinity;
-		this.maxArticles = maxArticles || Infinity;
-		this.concurrencyLimit = concurrencyLimit || 2;
-		this.crawlingDelay = crawlingDelay || 1000;
+		this.baseURL = config.baseURL;
+		this.startURL = config.startURL || config.baseURL;
+		this.strictBaseURL = config.strictBaseURL || true;
+		this.maxDepth = config.maxDepth || Infinity;
+		this.maxArticles = config.maxArticles || Infinity;
+		this.concurrencyLimit = config.concurrencyLimit || 2;
+		this.crawlingDelay = config.crawlingDelay || 1000;
 
 		// Output paths setup
-		this.scrapResultPath = scrapResultPath || "./dataset";
-		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
+		this.scrapResultPath = config.scrapResultPath || "./dataset";
+		this.textOutputPath = config.textOutputPath || path.join( this.scrapResultPath, "texts" );
 		this.textOutputPathWithMeta = `${this.textOutputPath }_with_metadata`;
-		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
+		this.jsonlOutputPath = config.jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.jsonlOutputPathWithMeta = this.jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
-		this.csvOutputPath = csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
+		this.csvOutputPath = config.csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
 		this.csvOutputPathWithMeta = this.csvOutputPath.replace( ".csv", "_with_metadata.csv" );
 
 		// Metadata configuration
-		this.includeMetadata = includeMetadata || false;
-		this.metadataFields = new Set( metadataFields || [] );
+		this.includeMetadata = config.includeMetadata || false;
+		this.metadataFields = new Set( config.metadataFields || [] );
 
 		// URL filtering setup
 		this.visited = new Set();
-		this.excludeList = this.normalizeExcludeList( excludeList );
-		this.exactExcludeList = this.normalizeExcludeList( exactExcludeList );
-		this.filterFileTypes = filterFileTypes || true;
-		this.excludedFileTypes = excludedFileTypes || [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"];
-		this.removeURLFragment = removeURLFragment || true;
+		this.excludeList = this.normalizeExcludeList( config.excludeList );
+		this.exactExcludeList = this.normalizeExcludeList( config.exactExcludeList );
+		this.filterFileTypes = config.filterFileTypes ?? true;
+		this.excludedFileTypes = config.excludedFileTypes || [".mp3", ".mp4", ".wav", ".avi", ".mov", ".pdf", ".zip", ".rar"];
+		this.removeURLFragment = config.removeURLFragment ?? true;
 
 		// Network configuration
-		this.axiosHeaders = axiosHeaders;
-		this.axiosProxy = axiosProxy;
-		this.axiosMaxRetries = axiosMaxRetries || 5;
-		this.axiosRetryDelay = axiosRetryDelay || 40000;
-		this.useProxyAsFallback = useProxyAsFallback || false;
+		this.axiosHeaders = config.axiosHeaders;
+		this.axiosProxy = config.axiosProxy;
+		this.axiosMaxRetries = config.axiosMaxRetries || 5;
+		this.axiosRetryDelay = config.axiosRetryDelay || 40000;
+		this.useProxyAsFallback = config.useProxyAsFallback || false;
 		this.axiosOptions = {};
 		if ( this.axiosHeaders )
 		{
@@ -59,10 +59,10 @@ class WebScraper
 		this.allProcessedContent = [];
 
 		// Puppeteer configuration
-		this.usePuppeteer = usePuppeteer || false;
-		this.puppeteerProxy = puppeteerProxy; // http://127.0.0.1:2080
-		this.puppeteerExecutablePath = puppeteerExecutablePath;
-		this.puppeteerRealProxy = puppeteerRealProxy;
+		this.usePuppeteer = config.usePuppeteer || false;
+		this.puppeteerProxy = config.puppeteerProxy; // http://127.0.0.1:2080
+		this.puppeteerExecutablePath = config.puppeteerExecutablePath;
+		this.puppeteerRealProxy = config.puppeteerRealProxy;
 		this.configurePuppeteer();
 	}
 
