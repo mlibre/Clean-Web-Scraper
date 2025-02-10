@@ -7,45 +7,7 @@ const { connect } = require( "puppeteer-real-browser" )
 
 class WebScraper
 {
-	constructor ({
-		// Base configuration
-		baseURL,
-		startURL,
-		strictBaseURL,
-		maxDepth,
-		maxArticles,
-		concurrencyLimit,
-		maxRetries,
-		retryDelay,
-
-		// URL filtering
-		excludeList = [],
-		exactExcludeList = [],
-		filterFileTypes,
-		excludedFileTypes,
-		removeURLFragment,
-
-		// Output paths
-		scrapResultPath = "./dataset",
-		jsonlOutputPath,
-		textOutputPath,
-		csvOutputPath,
-
-		// Metadata options
-		includeMetadata = false,
-		metadataFields = [],
-
-		// Network options
-		axiosHeaders,
-		axiosProxy,
-		useProxyAsFallback,
-
-		// Puppeteer options
-		usePuppeteer,
-		puppeteerProxy, // e.g. http://127.0.0.1:2080
-		puppeteerExecutablePath,
-		puppeteerRealProxy
-	})
+	constructor ( config )
 	{
 		// Base configuration
 		this.baseURL = baseURL;
@@ -54,11 +16,10 @@ class WebScraper
 		this.maxDepth = maxDepth || Infinity;
 		this.maxArticles = maxArticles || Infinity;
 		this.concurrencyLimit = concurrencyLimit || 2;
-		this.maxRetries = maxRetries || 5;
-		this.retryDelay = retryDelay || 40000;
+		this.crawlingDelay = crawlingDelay || 1000;
 
 		// Output paths setup
-		this.scrapResultPath = scrapResultPath;
+		this.scrapResultPath = scrapResultPath || "./dataset";
 		this.textOutputPath = textOutputPath || path.join( this.scrapResultPath, "texts" );
 		this.textOutputPathWithMeta = `${this.textOutputPath }_with_metadata`;
 		this.jsonlOutputPath = jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
@@ -67,8 +28,8 @@ class WebScraper
 		this.csvOutputPathWithMeta = this.csvOutputPath.replace( ".csv", "_with_metadata.csv" );
 
 		// Metadata configuration
-		this.includeMetadata = includeMetadata;
-		this.metadataFields = new Set( metadataFields );
+		this.includeMetadata = includeMetadata || false;
+		this.metadataFields = new Set( metadataFields || [] );
 
 		// URL filtering setup
 		this.visited = new Set();
@@ -81,6 +42,8 @@ class WebScraper
 		// Network configuration
 		this.axiosHeaders = axiosHeaders;
 		this.axiosProxy = axiosProxy;
+		this.axiosMaxRetries = axiosMaxRetries || 5;
+		this.axiosRetryDelay = axiosRetryDelay || 40000;
 		this.useProxyAsFallback = useProxyAsFallback || false;
 		this.axiosOptions = {};
 		if ( this.axiosHeaders )
@@ -97,7 +60,7 @@ class WebScraper
 
 		// Puppeteer configuration
 		this.usePuppeteer = usePuppeteer || false;
-		this.puppeteerProxy = puppeteerProxy;
+		this.puppeteerProxy = puppeteerProxy; // http://127.0.0.1:2080
 		this.puppeteerExecutablePath = puppeteerExecutablePath;
 		this.puppeteerRealProxy = puppeteerRealProxy;
 		this.configurePuppeteer( );
@@ -114,7 +77,7 @@ class WebScraper
 				this.puppeteerPage = page;
 			}
 			this.createOutputDirectory();
-			await this.fetchPage( this.startURL, 0 );
+			await this.crawl( this.startURL, 0 );
 			this.createJSONLFile();
 			this.saveNumberedTextFiles();
 			this.createCSVFile();
@@ -134,83 +97,86 @@ class WebScraper
 		}
 	}
 
-	async fetchPage ( url, depth )
+	async crawl ( initialUrl, initialDepth = 0 )
 	{
-		if ( this.removeURLFragment )
+		const queue = [{ url: initialUrl, depth: initialDepth }];
+		for ( let i = 0; i < queue.length; i++ )
 		{
-			url = url.split( "#" )[0];
-		}
-		if ( this.hasReachedMax( depth ) )
-		{
-			return;
-		}
-		if ( this.visited.has( url ) )
-		{
-			console.log( `Already visited: ${url}` );
-			return;
-		}
-		this.visited.add( url );
-		if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
-		{
-			return;
-		}
-		try
-		{
-			await WebScraper.sleep( 5000 );
-			const data = await this.fetchContent( url );
-			if ( !data ) return;
-			const dom = new JSDOM( data, { url });
-			const { document } = dom.window;
-
-			if ( !this.isExcluded( url ) )
+			console.log( `Processing URL: ${queue[i].url}` );
+			let { url, depth } = queue[i];
+			if ( this.hasReachedMax( depth ) )
 			{
-				const reader = new Readability( document, { charThreshold: 500, nbTopCandidates: 20 });
-				const article = reader.parse();
+				continue;
+			}
+			if ( this.removeURLFragment )
+			{
+				url = url.split( "#" )[0];
+			}
+			if ( this.visited.has( url ) )
+			{
+				console.log( `Already visited: ${url}` );
+				continue;
+			}
+			this.visited.add( url );
 
-				if ( article )
+			if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
+			{
+				continue;
+			}
+
+			try
+			{
+				await WebScraper.sleep( this.crawlingDelay );
+				const data = await this.fetchContent( url );
+				if ( !data ) continue;
+
+				const dom = new JSDOM( data, { url });
+				const { document } = dom.window;
+
+				if ( !this.isExcluded( url ) )
 				{
-					if ( this.hasValidPageContent( article.textContent ) )
+					const reader = new Readability( document, {
+						charThreshold: 500,
+						nbTopCandidates: 20
+					});
+					const article = reader.parse();
+
+					if ( article )
 					{
-						const metadata = this.extractMetadata( url, document );
-						this.saveArticle( url, article.textContent, metadata );
+						if ( this.hasValidPageContent( article.textContent ) )
+						{
+							const metadata = this.extractMetadata( url, document );
+							this.saveArticle( url, article.textContent, metadata );
+						}
+						else
+						{
+							console.error( `Invalid content found at ${url}` );
+						}
 					}
 					else
 					{
-						console.error( `Invalid content found at ${url}` );
+						console.error( `No readable content found at ${url}` );
 					}
 				}
-				else
-				{
-					console.error( `No readable content found at ${url}` );
-				}
-			}
 
-			const links = this.extractLinks( data );
-			const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
+				const links = this.extractLinks( data );
+				const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
 
-			for ( let i = 0; i < unvisitedLinks.length; i += this.concurrencyLimit )
-			{
-				if ( this.hasReachedMax( depth ) )
+				for ( const link of unvisitedLinks )
 				{
-					return;
-				}
-				const batch = unvisitedLinks.slice( i, i + this.concurrencyLimit );
-				const results = await Promise.allSettled( batch.map( link => { return this.fetchPage( link, depth + 1 ) }) );
-
-				results.forEach( ( result, index ) =>
-				{
-					if ( result.status === "rejected" )
+					if ( !this.hasReachedMax( depth ) )
 					{
-						console.error( `Failed to fetch ${batch[index]}: ${result.reason}` );
+						queue.push({ url: link, depth: depth + 1 });
 					}
-				});
+				}
 			}
-		}
-		catch ( error )
-		{
-			console.error( `Error fetching ${url}:`, error.message, error.code );
+			catch ( error )
+			{
+				console.error( `Error fetching ${url}:`, error.message, error.code );
+			}
 		}
 	}
+
 
 	async fetchContent ( url )
 	{
@@ -581,7 +547,7 @@ class WebScraper
 			...this.axiosOptions,
 		};
 
-		for ( let attempt = 1; attempt <= this.maxRetries; attempt++ )
+		for ( let attempt = 1; attempt <= this.axiosMaxRetries; attempt++ )
 		{
 			try
 			{
@@ -589,7 +555,7 @@ class WebScraper
 				{
 					break;
 				}
-				if ( attempt === this.maxRetries && this.useProxyAsFallback && this.axiosProxy )
+				if ( attempt === this.axiosMaxRetries && this.useProxyAsFallback && this.axiosProxy )
 				{
 					options = {
 						...options,
@@ -601,9 +567,9 @@ class WebScraper
 			}
 			catch ( error )
 			{
-				if ( attempt >= this.maxRetries ) throw error;
-				await WebScraper.sleep( this.retryDelay * attempt );
-				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.maxRetries})`, error.message, error.code );
+				if ( attempt >= this.axiosMaxRetries ) throw error;
+				await WebScraper.sleep( this.axiosRetryDelay * attempt );
+				console.error( `Retrying request to ${url} (Attempt ${attempt + 1}/${this.axiosMaxRetries})`, error.message, error.code );
 			}
 		}
 		throw new Error( "Max retries reached" );
