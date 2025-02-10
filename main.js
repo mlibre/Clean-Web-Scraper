@@ -3,11 +3,11 @@ const { JSDOM } = require( "jsdom" );
 const { Readability } = require( "@mozilla/readability" );
 const fs = require( "fs" );
 const path = require( "path" );
-const { connect } = require( "puppeteer-real-browser" )
+const { connect } = require( "puppeteer-real-browser" );
 
 class WebScraper
 {
-	constructor ( config )
+	constructor ( config = {})
 	{
 		// Base configuration
 		this.baseURL = baseURL;
@@ -63,7 +63,7 @@ class WebScraper
 		this.puppeteerProxy = puppeteerProxy; // http://127.0.0.1:2080
 		this.puppeteerExecutablePath = puppeteerExecutablePath;
 		this.puppeteerRealProxy = puppeteerRealProxy;
-		this.configurePuppeteer( );
+		this.configurePuppeteer();
 	}
 
 	async start ()
@@ -72,7 +72,7 @@ class WebScraper
 		{
 			if ( this.usePuppeteer )
 			{
-				let { browser, page } = await connect( this.puppeteerRealOptions )
+				const { browser, page } = await connect( this.puppeteerRealOptions );
 				this.puppeteerBrowser = browser;
 				this.puppeteerPage = page;
 			}
@@ -92,7 +92,7 @@ class WebScraper
 		{
 			if ( this.puppeteerBrowser )
 			{
-				await this.puppeteerBrowser.close(); // Close the browser after scraping
+				await this.puppeteerBrowser.close();
 			}
 		}
 	}
@@ -102,8 +102,8 @@ class WebScraper
 		const queue = [{ url: initialUrl, depth: initialDepth }];
 		for ( let i = 0; i < queue.length; i++ )
 		{
-			console.log( `Processing URL: ${queue[i].url}` );
 			let { url, depth } = queue[i];
+			console.log( `Processing URL: ${queue[i].url}` );
 			if ( this.hasReachedMax( depth ) )
 			{
 				continue;
@@ -140,7 +140,6 @@ class WebScraper
 						nbTopCandidates: 20
 					});
 					const article = reader.parse();
-
 					if ( article )
 					{
 						if ( this.hasValidPageContent( article.textContent ) )
@@ -161,7 +160,6 @@ class WebScraper
 
 				const links = this.extractLinks( data );
 				const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
-
 				for ( const link of unvisitedLinks )
 				{
 					if ( !this.hasReachedMax( depth ) )
@@ -182,7 +180,7 @@ class WebScraper
 	{
 		try
 		{
-			const response = await this.retryAxiosRequest( url )
+			const response = await this.retryAxiosRequest( url );
 			const contentType = response?.headers["content-type"] || "";
 			if ( !contentType?.startsWith( "text" ) )
 			{
@@ -191,34 +189,30 @@ class WebScraper
 				return null;
 			}
 
-			// Step 3: If Content-Type is HTML, read the full response
 			let htmlContent = "";
-			response.data.on( "data", ( chunk ) =>
+			response.data.on( "data", chunk =>
 			{
 				htmlContent += chunk.toString();
 			});
-
-			// Wait for the stream to finish
 			await new Promise( ( resolve, reject ) =>
 			{
 				response.data.on( "end", resolve );
 				response.data.on( "error", reject );
 			});
-
 			return htmlContent;
 		}
 		catch ( error )
 		{
 			console.error( `Error fetching content ${url}:`, error.message );
-			if ( error.status = 403 && this.usePuppeteer )
+			if ( error.status === 403 && this.usePuppeteer )
 			{
 				try
 				{
 					let result;
-					for ( let index = 0; index < 10; index++ )
+					for ( let i = 0; i < 10; i++ )
 					{
 						console.log( `Please solve the CAPTCHA on the opened browser window for ${url}` );
-						result = await this.navigateToPage( url ) ;
+						result = await this.navigateToPage( url );
 						if ( this.hasValidPageContent( result.htmlContent ) )
 						{
 							break
@@ -231,7 +225,6 @@ class WebScraper
 					console.error( `Error solving CAPTCHA for ${url}:`, error.message, error );
 					throw error;
 				}
-
 			}
 			throw error;
 		}
@@ -344,11 +337,10 @@ class WebScraper
 	createJSONLFile ()
 	{
 		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPath ) );
-		let writeStreamMeta
+		writeStreamSimple.on( "error", err =>
+		{ return console.error( "Error writing JSONL:", err ) });
 
-		// Add error handlers
-		writeStreamSimple.on( "error", ( err ) => { return console.error( "Error writing JSONL:", err ) });
-
+		let writeStreamMeta;
 		if ( this.includeMetadata )
 		{
 			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPathWithMeta ) );
@@ -394,16 +386,18 @@ class WebScraper
 
 		for ( const content of this.allProcessedContent )
 		{
-			// Write simple version
 			const escapedText = content.simple.text.replace( /"/g, "\"\"" );
 			writeStreamSimple.write( `"${escapedText}"\n` );
 
-			// Write metadata version if requested
 			if ( this.includeMetadata )
 			{
 				const { metadata } = content.withMetadata;
-				const metadataValues = Array.from( this.metadataFields )
-				.map( field => { return metadata[field] ? `"${metadata[field].replace( /"/g, "\"\"" )}"` : "\"\"" });
+				const metadataValues = Array.from( this.metadataFields ).map( field =>
+				{
+					return metadata[field]
+						? `"${metadata[field].replace( /"/g, "\"\"" )}"`
+						: "\"\""
+				});
 				writeStreamMeta.write( `"${escapedText}",${metadataValues.join( "," )}\n` );
 			}
 		}
@@ -422,10 +416,8 @@ class WebScraper
 
 	saveNumberedTextFiles ()
 	{
-		// Create base text folder for simple content
 		const baseTextPath = path.join( __dirname, this.textOutputPath );
 
-		// Create metadata text folder if needed
 		let metaTextPath = null;
 		if ( this.includeMetadata )
 		{
@@ -436,20 +428,15 @@ class WebScraper
 		this.allProcessedContent.forEach( ( content, index ) =>
 		{
 			const fileName = `${index + 1}.txt`;
-
-			// Always save simple version
 			const simpleFilePath = path.join( baseTextPath, fileName );
 			fs.writeFileSync( simpleFilePath, content.simple.text, "utf-8" );
 			console.log( `Created simple text file: ${fileName}` );
 
-			// Save metadata version if enabled
 			if ( this.includeMetadata )
 			{
 				const metaFilePath = path.join( metaTextPath, fileName );
 				let fileContent = "";
-
 				const { metadata } = content.withMetadata;
-				// Add metadata fields as headers
 				for ( const field of this.metadataFields )
 				{
 					if ( metadata[field] )
@@ -459,7 +446,6 @@ class WebScraper
 				}
 				fileContent += "\n---\n\n";
 				fileContent += content.withMetadata.text;
-
 				fs.writeFileSync( metaFilePath, fileContent, "utf-8" );
 				console.log( `Created metadata text file: ${fileName}` );
 			}
@@ -469,33 +455,27 @@ class WebScraper
 	processContent ( content )
 	{
 		let processed = content;
-
-		// Remove "[You can read more about this here]" and similar patterns
+		// Remove unwanted fixed text
 		processed = processed.replace( /\[You can read more about this here\]/g, "" ).trim();
-
-		// Trim each line
-		processed = processed.split( "\n" )
+		// Trim each line and remove extra newlines
+		processed = processed
+		.split( "\n" )
 		.map( line => { return line.trim() })
-		.join( "\n" );
+		.join( "\n" )
+		.replace( /\n{3,}/g, "\n\n" );
 
-		// Replace 3 or more newlines with a single newline
-		processed = processed.replace( /\n{3,}/g, "\n\n" );
-
-		// Add more processing rules as needed:
-		// processed = processed.replace(/\[.*?\]/g, ''); // Removes all content within square brackets
-		// processed = processed.replace(/\(.*?\)/g, ''); // Removes all content within parentheses
-
-		// Remove specified words from the end of content, handling multiple occurrences
+		// Remove specified words at the end (repeatedly)
 		const wordsToTrim = ["Facebook", "Twitter", "Donate Now", "Instagram"];
 		let changed = true;
-
 		while ( changed )
 		{
 			changed = false;
-			for ( let i = 0; i < wordsToTrim.length; i++ )
+			for ( const word of wordsToTrim )
 			{
 				const oldProcessed = processed;
-				processed = processed.replace( new RegExp( `\\s*${wordsToTrim[i]}\\s*$`, "g" ), "" ).trim();
+				processed = processed
+				.replace( new RegExp( `\\s*${word}\\s*$`, "g" ), "" )
+				.trim();
 				if ( oldProcessed !== processed )
 				{
 					changed = true;
@@ -508,7 +488,6 @@ class WebScraper
 	filterMetadata ( metadata )
 	{
 		if ( !this.includeMetadata ) return {};
-
 		const filteredMetadata = {};
 		for ( const field of this.metadataFields )
 		{
@@ -528,10 +507,13 @@ class WebScraper
 			description: document.querySelector( "meta[name=\"description\"]" )?.content,
 			keywords: document.querySelector( "meta[name=\"keywords\"]" )?.content,
 			author: document.querySelector( "meta[name=\"author\"]" )?.content,
-			language: document.documentElement.lang || document.querySelector( "html" )?.getAttribute( "lang" ),
+			language:
+        document.documentElement.lang ||
+        document.querySelector( "html" )?.getAttribute( "lang" ),
 			canonicalUrl: document.querySelector( "link[rel=\"canonical\"]" )?.href,
 			ogTitle: document.querySelector( "meta[property=\"og:title\"]" )?.content,
-			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )?.content,
+			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )
+			?.content,
 			ogImage: document.querySelector( "meta[property=\"og:image\"]" )?.content,
 			ogType: document.querySelector( "meta[property=\"og:type\"]" )?.content,
 			dateScrapedDate: new Date().toISOString()
@@ -589,7 +571,6 @@ class WebScraper
 		{
 			this.puppeteerOptions.args.push( `--proxy-server=${this.puppeteerProxy}` );
 		}
-
 		if ( this.puppeteerExecutablePath )
 		{
 			this.puppeteerOptions.executablePath = this.puppeteerExecutablePath;
@@ -663,10 +644,7 @@ class WebScraper
 
 	hasValidPageContent ( content )
 	{
-		// Remove whitespace and newlines for checking
 		const cleanContent = content.replace( /\s+/g, " " ).trim().toLowerCase();
-
-		// List of phrases that indicate invalid content
 		const invalidPhrases = [
 			"verifying that you are not a robot",
 			"verifying you are human. this may take a few seconds.",
@@ -690,37 +668,35 @@ class WebScraper
 
 	createOutputDirectory ()
 	{
-		if ( fs.existsSync( path.join( __dirname, this.scrapResultPath ) ) )
+		const paths = [
+			path.join( __dirname, this.scrapResultPath ),
+			path.join( __dirname, this.textOutputPath ),
+			path.join( __dirname, this.textOutputPathWithMeta ),
+			path.join( __dirname, this.csvOutputPath ),
+			path.join( __dirname, this.csvOutputPathWithMeta ),
+			path.join( __dirname, this.jsonlOutputPath ),
+			path.join( __dirname, this.jsonlOutputPathWithMeta )
+		];
+		for ( const p of paths )
 		{
-			fs.rmSync( path.join( __dirname, this.scrapResultPath ), { recursive: true, force: true });
+			if ( fs.existsSync( p ) )
+			{
+				fs.rmSync( p, { recursive: true, force: true });
+			}
 		}
-		if ( fs.existsSync( path.join( __dirname, this.textOutputPath ) ) )
+		// Recreate directories needed for output
+		this.ensureDirectory( path.join( __dirname, this.scrapResultPath ) );
+		this.ensureDirectory( path.join( __dirname, this.textOutputPath ) );
+		this.ensureDirectory( path.join( __dirname, this.textOutputPathWithMeta ) );
+	}
+
+	// Helper method to ensure a directory exists
+	ensureDirectory ( dirPath )
+	{
+		if ( !fs.existsSync( dirPath ) )
 		{
-			fs.rmSync( path.join( __dirname, this.textOutputPath ), { recursive: true, force: true });
+			fs.mkdirSync( dirPath, { recursive: true });
 		}
-		if ( fs.existsSync( path.join( __dirname, this.textOutputPathWithMeta ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.textOutputPathWithMeta ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.csvOutputPath ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.csvOutputPath ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.csvOutputPathWithMeta ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.csvOutputPathWithMeta ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPath ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.jsonlOutputPath ), { recursive: true, force: true });
-		}
-		if ( fs.existsSync( path.join( __dirname, this.jsonlOutputPathWithMeta ) ) )
-		{
-			fs.rmSync( path.join( __dirname, this.jsonlOutputPathWithMeta ), { recursive: true, force: true });
-		}
-		fs.mkdirSync( path.join( __dirname, this.scrapResultPath ), { recursive: true });
-		fs.mkdirSync( path.join( __dirname, this.textOutputPath ), { recursive: true });
-		fs.mkdirSync( path.join( __dirname, this.textOutputPathWithMeta ), { recursive: true });
 	}
 
 	static async sleep ( ms )
@@ -732,11 +708,7 @@ class WebScraper
 	{
 		await WebScraper.sleep( 1000 );
 		const fullOutputPath = path.join( __dirname, outputPath );
-
-		// Create output directories
 		WebScraper.createCombinedDirectories( fullOutputPath );
-
-		// Combine files by type
 		WebScraper.combineJSONLFiles( fullOutputPath, websites );
 		WebScraper.combineCSVFiles( fullOutputPath, websites );
 		WebScraper.combineTextFiles( fullOutputPath, websites );
@@ -750,34 +722,44 @@ class WebScraper
 		}
 		fs.mkdirSync( fullOutputPath, { recursive: true });
 		fs.mkdirSync( path.join( fullOutputPath, "texts" ), { recursive: true });
-		fs.mkdirSync( path.join( fullOutputPath, "texts_with_metadata" ), { recursive: true });
+		fs.mkdirSync( path.join( fullOutputPath, "texts_with_metadata" ), {
+			recursive: true
+		});
 	}
 
 	static combineJSONLFiles ( fullOutputPath, websites )
 	{
-		const jsonlOutput = fs.createWriteStream( path.join( fullOutputPath, "combined.jsonl" ) )
-		.on( "error", ( err ) => { return console.error( "Error combining JSONL:", err ) });
-		const jsonlMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.jsonl" ) )
-		.on( "error", ( err ) => { return console.error( "Error combining metadata JSONL:", err ) });
+		const jsonlOutput = fs
+		.createWriteStream( path.join( fullOutputPath, "combined.jsonl" ) )
+		.on( "error", err =>
+		{ return console.error( "Error combining JSONL:", err ) });
+		const jsonlMetaOutput = fs
+		.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.jsonl" ) )
+		.on( "error", err =>
+		{ return console.error( "Error combining metadata JSONL:", err ) });
 
 		for ( const website of websites )
 		{
-			const jsonlContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPath ), "utf-8" );
+			const jsonlContent = fs.readFileSync(
+				path.join( __dirname, website.jsonlOutputPath ),
+				"utf-8"
+			);
 			if ( jsonlContent )
 			{
 				jsonlOutput.write( jsonlContent );
 			}
-
 			if ( website.includeMetadata )
 			{
-				const jsonlMetaContent = fs.readFileSync( path.join( __dirname, website.jsonlOutputPathWithMeta ), "utf-8" );
+				const jsonlMetaContent = fs.readFileSync(
+					path.join( __dirname, website.jsonlOutputPathWithMeta ),
+					"utf-8"
+				);
 				if ( jsonlMetaContent )
 				{
 					jsonlMetaOutput.write( jsonlMetaContent );
 				}
 			}
 		}
-
 		jsonlOutput.end();
 		jsonlMetaOutput.end();
 	}
@@ -788,7 +770,8 @@ class WebScraper
 		const csvMetaOutput = fs.createWriteStream( path.join( fullOutputPath, "combined_with_metadata.csv" ) );
 
 		csvOutput.write( "text\n" );
-		const metadataFields = websites.find( w => { return w.includeMetadata })?.metadataFields || new Set();
+		const metadataFields =
+      websites.find( w => { return w.includeMetadata })?.metadataFields || new Set();
 
 		if ( metadataFields.size > 0 )
 		{
@@ -805,10 +788,13 @@ class WebScraper
 			{
 				csvOutput.write( `${csvContent.join( "\n" )}\n` );
 			}
-
 			if ( website.includeMetadata )
 			{
-				const csvMetaContent = fs.readFileSync( path.join( __dirname, website.csvOutputPathWithMeta ), "utf-8" )
+				const csvMetaContent = fs
+				.readFileSync(
+					path.join( __dirname, website.csvOutputPathWithMeta ),
+					"utf-8"
+				)
 				.split( "\n" )
 				.slice( 1 )
 				.filter( line => { return line.trim() });
@@ -818,7 +804,6 @@ class WebScraper
 				}
 			}
 		}
-
 		csvOutput.end();
 		csvMetaOutput.end();
 	}
@@ -826,20 +811,20 @@ class WebScraper
 	static combineTextFiles ( fullOutputPath, websites )
 	{
 		let textFileCounter = 1;
-
 		for ( const website of websites )
 		{
 			const textFiles = fs.readdirSync( path.join( __dirname, website.textOutputPath ) );
-
 			for ( const file of textFiles )
 			{
-				const content = fs.readFileSync( path.join( __dirname, website.textOutputPath, file ), "utf-8" );
+				const content = fs.readFileSync(
+					path.join( __dirname, website.textOutputPath, file ),
+					"utf-8"
+				);
 				fs.writeFileSync(
 					path.join( fullOutputPath, "texts", `${textFileCounter}.txt` ),
 					content,
 					"utf-8"
 				);
-
 				if ( website.includeMetadata )
 				{
 					const metaContent = fs.readFileSync(
@@ -847,7 +832,11 @@ class WebScraper
 						"utf-8"
 					);
 					fs.writeFileSync(
-						path.join( fullOutputPath, "texts_with_metadata", `${textFileCounter}.txt` ),
+						path.join(
+							fullOutputPath,
+							"texts_with_metadata",
+							`${textFileCounter}.txt`
+						),
 						metaContent,
 						"utf-8"
 					);
