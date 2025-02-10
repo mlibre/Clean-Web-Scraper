@@ -61,7 +61,11 @@ const scraper = new WebScraper({
   
   // Network options
   axiosHeaders: {},                             // Optional: Custom HTTP headers
-  axiosProxy: "http://proxy:port",              // Optional: HTTP/HTTPS proxy
+  axiosProxy: {                                 // Optional: HTTP/HTTPS proxy
+   host: "localhost",
+   port: 2080,
+   protocol: "http"
+  },              
   axiosMaxRetries: 5,                           // Optional: Max retry attempts
   axiosRetryDelay: 40000,                       // Optional: Delay between retries (ms)
   useProxyAsFallback: false,                    // Optional: Fallback to proxy on failure
