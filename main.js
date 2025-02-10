@@ -15,13 +15,12 @@ class WebScraper
 		this.strictBaseURL = config.strictBaseURL || true;
 		this.maxDepth = config.maxDepth || Infinity;
 		this.maxArticles = config.maxArticles || Infinity;
-		this.concurrencyLimit = config.concurrencyLimit || 2;
 		this.crawlingDelay = config.crawlingDelay ?? 1000;
 
 		// Output paths setup
 		this.scrapResultPath = config.scrapResultPath || "./dataset";
 		this.textOutputPath = config.textOutputPath || path.join( this.scrapResultPath, "texts" );
-		this.textOutputPathWithMeta = `${this.textOutputPath }_with_metadata`;
+		this.textOutputPathWithMeta = `${this.textOutputPath}_with_metadata`;
 		this.jsonlOutputPath = config.jsonlOutputPath || path.join( this.scrapResultPath, "train.jsonl" );
 		this.jsonlOutputPathWithMeta = this.jsonlOutputPath.replace( ".jsonl", "_with_metadata.jsonl" );
 		this.csvOutputPath = config.csvOutputPath || path.join( this.scrapResultPath, "train.csv" );
@@ -60,8 +59,6 @@ class WebScraper
 
 		// Puppeteer configuration
 		this.usePuppeteer = config.usePuppeteer || false;
-		this.puppeteerProxy = config.puppeteerProxy; // http://127.0.0.1:2080
-		this.puppeteerExecutablePath = config.puppeteerExecutablePath;
 		this.puppeteerRealProxy = config.puppeteerRealProxy;
 		this.configurePuppeteer();
 	}
@@ -562,23 +559,6 @@ class WebScraper
 
 	configurePuppeteer ( )
 	{
-		this.puppeteerOptions = {
-			headless: false,
-			userDataDir: "./tmp/browser",
-			defaultViewport: null,
-			args: ["--start-maximized"],
-			ignoreDefaultArgs: true
-		};
-
-		if ( this.puppeteerProxy )
-		{
-			this.puppeteerOptions.args.push( `--proxy-server=${this.puppeteerProxy}` );
-		}
-		if ( this.puppeteerExecutablePath )
-		{
-			this.puppeteerOptions.executablePath = this.puppeteerExecutablePath;
-		}
-
 		this.puppeteerRealOptions = {
 			headless: false,
 			args: [],

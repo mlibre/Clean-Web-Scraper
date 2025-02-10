@@ -56,7 +56,6 @@ const scraper = new WebScraper({
   strictBaseURL: true,                          // Optional: Only scrape URLs from same domain
   maxDepth: Infinity,                           // Optional: Maximum crawling depth
   maxArticles: Infinity,                        // Optional: Maximum articles to scrape
-  concurrencyLimit: 2,                          // Optional: Limit concurrent requests
   crawlingDelay: 1000,                          // Optional: Delay between requests (ms)
   
   // Network options
@@ -72,8 +71,6 @@ const scraper = new WebScraper({
   
   // Puppeteer options for handling dynamic content
   usePuppeteer: false,                          // Optional: Enable Puppeteer browser
-  puppeteerProxy: "http://127.0.0.1:2080",      // Optional: Puppeteer proxy
-  puppeteerExecutablePath: "/path/to/chrome",   // Optional: Custom browser path
 });
 await scraper.start();
 ```

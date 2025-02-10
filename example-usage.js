@@ -1,17 +1,25 @@
 const WebScraper = require( "./main" );
 
-// const cookies = "cf_clearance=ENHJkpw.ycd1tZ_A.d0O27QdslTN0EHaNurhCznfimg-1738241402-1.2.1.1-BlO.WitkGwE3U3vSamX35xP.AgN1HyvHWL03Jhe.twbn4QWojiw1T4.0M4lE_TcIeZrQ6ErwV9kQBMBKmfU0S6lQth1BJx7UpWn4T6wtFm83LmF.cB13PQYSQgGFGsH7qOkGIjbBhMbceQNp.y2XZgLq_hdntGKSBMe0iCUotx_xsqlzkolQIqnUYID3BLEQXZqNvqJOwkzLZ7.kzrwP42VdEuWEvT4jt7F3TkTaU9rumAp8FSNO1.hnr76Tv23OITm17rPD3__Ghdu1D0E.4v693nEiVYO_KQYNf_8gk0vXP.KAvUKA2zQyBmDXkfW3M1MkoLjFNZCanx9FPRVO7g";
 const headers = {
 	"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0",
 	"Cache-Control": "private",
 	"Accept": "application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5",
 	// "Cookie": cookies
+};
+
+async function runScraper ( config, enable )
+{
+	const scraper = new WebScraper( config );
+	if ( enable )
+	{
+		await scraper.start();
+	}
+	return scraper;
 }
 
 async function palianswers ( enable )
 {
-	// https://palianswers.com
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://palianswers.com",
 		excludeList: [
 			"https://palianswers.com/chat/",
@@ -22,7 +30,7 @@ async function palianswers ( enable )
 			"https://palianswers.com/themes/"
 		],
 		exactExcludeList: [
-			"https://palianswers.com/",
+			"https://palianswers.com/"
 		],
 		scrapResultPath: "./dataset/palianswers/website",
 		jsonlOutputPath: "./dataset/palianswers/train.jsonl",
@@ -31,21 +39,14 @@ async function palianswers ( enable )
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		axiosRetryDelay: 10000,
-		concurrencyLimit: 4,
 		crawlingDelay: 0
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function khameneiIrFreePalestineTag ( enable )
 {
-	// https://english.khamenei.ir/Opinions/FreePalestine
-	// https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 		maxDepth: 1,
@@ -59,19 +60,13 @@ async function khameneiIrFreePalestineTag ( enable )
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		axiosRetryDelay: 10000,
-		concurrencyLimit: 4,
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function decolonizepalestine ( enable )
 {
-	// https://decolonizepalestine.com
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://decolonizepalestine.com",
 		excludeList: [
 			"https://decolonizepalestine.com/cdn-cgi",
@@ -91,19 +86,13 @@ async function decolonizepalestine ( enable )
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		axiosRetryDelay: 10000,
-		concurrencyLimit: 4,
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function electronicintifada ( enable )
 {
-	// https://electronicintifada.net
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://electronicintifada.net",
 		excludeList: [
 			"https://electronicintifada.net/updates",
@@ -132,7 +121,6 @@ async function electronicintifada ( enable )
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		maxDepth: 16,
 		maxArticles: 2000,
-		concurrencyLimit: 2,
 		axiosHeaders: headers,
 		axiosRetryDelay: 10000,
 		axiosProxy: {
@@ -141,17 +129,13 @@ async function electronicintifada ( enable )
 			protocol: "http"
 		},
 		useProxyAsFallback: true
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function standWithPalestine ( enable )
 {
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://stand-with-palestine.org/blogs",
 		startURL: "https://stand-with-palestine.org/blogs",
 		scrapResultPath: "./dataset/stand-with-palestine/website",
@@ -162,18 +146,13 @@ async function standWithPalestine ( enable )
 		axiosHeaders: headers,
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"]
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function mondoweiss ( enable )
 {
-	// https://mondoweiss.net
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://mondoweiss.net",
 		excludeList: [
 			"https://mondoweiss.net/donate",
@@ -200,7 +179,6 @@ async function mondoweiss ( enable )
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		maxArticles: 2500,
 		axiosMaxRetries: 3,
-		concurrencyLimit: 3,
 		axiosHeaders: headers,
 		axiosProxy: {
 			host: "localhost",
@@ -212,18 +190,13 @@ async function mondoweiss ( enable )
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		useProxyAsFallback: true
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function bdsmovement ( enable )
 {
-	// https://bdsmovement.net
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://bdsmovement.net",
 		excludeList: [
 			"https://bdsmovement.net/press-area",
@@ -239,24 +212,17 @@ async function bdsmovement ( enable )
 		csvOutputPath: "./dataset/bdsmovement/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		puppeteerProxy: "socks5://127.0.0.1:2080",
-		puppeteerExecutablePath: "/usr/bin/chromium",
 		puppeteerRealProxy: {
 			host: "socks5://127.0.0.1",
 			port: "2080",
 		},
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 async function palestineremembered ( enable )
 {
-	// https://www.palestineremembered.com
-	const scraper = new WebScraper({
+	const config = {
 		baseURL: "https://www.palestineremembered.com",
 		startURL: "https://www.palestineremembered.com/ZionistFAQ.html",
 		excludeList: [
@@ -289,12 +255,8 @@ async function palestineremembered ( enable )
 			port: 2080,
 			protocol: "http"
 		}
-	});
-	if ( enable )
-	{
-		await scraper.start();
-	}
-	return scraper;
+	};
+	return await runScraper( config, enable );
 }
 
 void async function main ()
@@ -316,4 +278,4 @@ void async function main ()
 		standWithPalestineScraper,
 		mondoweisScraper
 	] );
-}()
+}();
