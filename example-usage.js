@@ -51,7 +51,8 @@ async function khameneiIrFreePalestineTag ( enable )
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 		maxDepth: 1,
 		exactExcludeList: [
-			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#"
+			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
+			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100"
 		],
 		scrapResultPath: "./dataset/khamenei-ir-free-palestine-tag/website",
 		jsonlOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.jsonl",
@@ -107,6 +108,8 @@ async function electronicintifada ( enable )
 			"https://electronicintifada.net/search/site/",
 			"https://electronicintifada.net/news",
 			"https://electronicintifada.net/opinion",
+			"https://electronicintifada.net/about-ei",
+			"https://electronicintifada.net/review"
 		],
 		exactExcludeList: [
 			"https://electronicintifada.net",
