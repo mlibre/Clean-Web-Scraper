@@ -16,7 +16,7 @@ class WebScraper
 		this.maxDepth = config.maxDepth || Infinity;
 		this.maxArticles = config.maxArticles || Infinity;
 		this.concurrencyLimit = config.concurrencyLimit || 2;
-		this.crawlingDelay = config.crawlingDelay || 1000;
+		this.crawlingDelay = config.crawlingDelay ?? 1000;
 
 		// Output paths setup
 		this.scrapResultPath = config.scrapResultPath || "./dataset";
@@ -126,7 +126,10 @@ class WebScraper
 
 			try
 			{
-				await WebScraper.sleep( this.crawlingDelay );
+				if ( this.crawlingDelay )
+				{
+					await WebScraper.sleep( this.crawlingDelay );
+				}
 				const data = await this.fetchContent( url );
 				if ( !data ) continue;
 

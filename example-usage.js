@@ -30,8 +30,9 @@ async function palianswers ( enable )
 		csvOutputPath: "./dataset/palianswers/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		retryDelay: 10000,
+		axiosRetryDelay: 10000,
 		concurrencyLimit: 4,
+		crawlingDelay: 0
 	});
 	if ( enable )
 	{
@@ -57,7 +58,7 @@ async function khameneiIrFreePalestineTag ( enable )
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		retryDelay: 10000,
+		axiosRetryDelay: 10000,
 		concurrencyLimit: 4,
 	});
 	if ( enable )
@@ -89,7 +90,7 @@ async function decolonizepalestine ( enable )
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		retryDelay: 10000,
+		axiosRetryDelay: 10000,
 		concurrencyLimit: 4,
 	});
 	if ( enable )
@@ -133,7 +134,7 @@ async function electronicintifada ( enable )
 		maxArticles: 2000,
 		concurrencyLimit: 2,
 		axiosHeaders: headers,
-		retryDelay: 10000,
+		axiosRetryDelay: 10000,
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
@@ -198,7 +199,7 @@ async function mondoweiss ( enable )
 		textOutputPath: "./dataset/mondoweiss/texts",
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		maxArticles: 2500,
-		maxRetries: 3,
+		axiosMaxRetries: 3,
 		concurrencyLimit: 3,
 		axiosHeaders: headers,
 		axiosProxy: {
@@ -207,7 +208,7 @@ async function mondoweiss ( enable )
 			protocol: "http"
 		},
 		maxDepth: 15,
-		retryDelay: 10000,
+		axiosRetryDelay: 10000,
 		includeMetadata: true,
 		metadataFields: ["author", "title", "description", "dateScrapedDate"],
 		useProxyAsFallback: true
