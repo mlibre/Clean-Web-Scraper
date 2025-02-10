@@ -135,16 +135,14 @@ class WebScraper
 
 				if ( !this.isExcluded( url ) )
 				{
-					const reader = new Readability( document, {
-						charThreshold: 500,
-						nbTopCandidates: 20
-					});
+					const reader = new Readability( document );
 					const article = reader.parse();
 					if ( article )
 					{
 						if ( this.hasValidPageContent( article.textContent ) )
 						{
 							const metadata = this.extractMetadata( url, document );
+ 							metadata.articleTitle = article.title || "";
 							this.saveArticle( url, article.textContent, metadata );
 						}
 						else
@@ -503,17 +501,14 @@ class WebScraper
 	{
 		return {
 			url,
-			title: document.title,
+			pageTitle: document.title,
 			description: document.querySelector( "meta[name=\"description\"]" )?.content,
 			keywords: document.querySelector( "meta[name=\"keywords\"]" )?.content,
 			author: document.querySelector( "meta[name=\"author\"]" )?.content,
-			language:
-        document.documentElement.lang ||
-        document.querySelector( "html" )?.getAttribute( "lang" ),
+			language: document.documentElement.lang || document.querySelector( "html" )?.getAttribute( "lang" ),
 			canonicalUrl: document.querySelector( "link[rel=\"canonical\"]" )?.href,
 			ogTitle: document.querySelector( "meta[property=\"og:title\"]" )?.content,
-			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )
-			?.content,
+			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )?.content,
 			ogImage: document.querySelector( "meta[property=\"og:image\"]" )?.content,
 			ogType: document.querySelector( "meta[property=\"og:type\"]" )?.content,
 			dateScrapedDate: new Date().toISOString()

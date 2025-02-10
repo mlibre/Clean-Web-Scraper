@@ -37,7 +37,7 @@ async function palianswers ( enable )
 		textOutputPath: "./dataset/palianswers/texts",
 		csvOutputPath: "./dataset/palianswers/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 		axiosRetryDelay: 10000,
 		crawlingDelay: 0
 	};
@@ -58,7 +58,7 @@ async function khameneiIrFreePalestineTag ( enable )
 		textOutputPath: "./dataset/khamenei-ir-free-palestine-tag/texts",
 		csvOutputPath: "./dataset/khamenei-ir-free-palestine-tag/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 		axiosRetryDelay: 10000,
 	};
 	return await runScraper( config, enable );
@@ -84,7 +84,7 @@ async function decolonizepalestine ( enable )
 		textOutputPath: "./dataset/decolonizepalestine/texts",
 		csvOutputPath: "./dataset/decolonizepalestine/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 		axiosRetryDelay: 10000,
 	};
 	return await runScraper( config, enable );
@@ -118,17 +118,19 @@ async function electronicintifada ( enable )
 		textOutputPath: "./dataset/electronicintifada/texts",
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 		maxDepth: 16,
 		maxArticles: 2000,
 		axiosHeaders: headers,
+		axiosMaxRetries: 2,
 		axiosRetryDelay: 10000,
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
 			protocol: "http"
 		},
-		useProxyAsFallback: true
+		useProxyAsFallback: true,
+		crawlingDelay: 0
 	};
 	return await runScraper( config, enable );
 }
@@ -138,14 +140,14 @@ async function standWithPalestine ( enable )
 	const config = {
 		baseURL: "https://stand-with-palestine.org/blogs",
 		startURL: "https://stand-with-palestine.org/blogs",
+		exactExcludeList: ["https://stand-with-palestine.org/blogs"],
 		scrapResultPath: "./dataset/stand-with-palestine/website",
 		jsonlOutputPath: "./dataset/stand-with-palestine/train.jsonl",
 		textOutputPath: "./dataset/stand-with-palestine/texts",
 		csvOutputPath: "./dataset/stand-with-palestine/train.csv",
-		exactExcludeList: ["https://stand-with-palestine.org/blogs"],
 		axiosHeaders: headers,
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"]
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"]
 	};
 	return await runScraper( config, enable );
 }
@@ -178,18 +180,18 @@ async function mondoweiss ( enable )
 		textOutputPath: "./dataset/mondoweiss/texts",
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		maxArticles: 2500,
-		axiosMaxRetries: 3,
+		maxDepth: 15,
 		axiosHeaders: headers,
+		axiosMaxRetries: 3,
+		axiosRetryDelay: 10000,
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
 			protocol: "http"
 		},
-		maxDepth: 15,
-		axiosRetryDelay: 10000,
+		useProxyAsFallback: true,
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
-		useProxyAsFallback: true
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 	};
 	return await runScraper( config, enable );
 }
@@ -211,7 +213,7 @@ async function bdsmovement ( enable )
 		textOutputPath: "./dataset/bdsmovement/texts",
 		csvOutputPath: "./dataset/bdsmovement/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 		puppeteerRealProxy: {
 			host: "socks5://127.0.0.1",
 			port: "2080",
@@ -249,7 +251,7 @@ async function palestineremembered ( enable )
 		textOutputPath: "./dataset/palestineremembered/texts",
 		csvOutputPath: "./dataset/palestineremembered/train.csv",
 		includeMetadata: true,
-		metadataFields: ["author", "title", "description", "dateScrapedDate"],
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
