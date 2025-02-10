@@ -690,7 +690,6 @@ class WebScraper
 		this.ensureDirectory( path.join( __dirname, this.textOutputPathWithMeta ) );
 	}
 
-	// Helper method to ensure a directory exists
 	ensureDirectory ( dirPath )
 	{
 		if ( !fs.existsSync( dirPath ) )
