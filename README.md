@@ -57,7 +57,8 @@ const scraper = new WebScraper({
   maxDepth: Infinity,                           // Optional: Maximum crawling depth
   maxArticles: Infinity,                        // Optional: Maximum articles to scrape
   crawlingDelay: 1000,                          // Optional: Delay between requests (ms)
-  
+  batchSize: 5,                                 // Optional: Number of URLs to process concurrently
+
   // Network options
   axiosHeaders: {},                             // Optional: Custom HTTP headers
   axiosProxy: {                                 // Optional: HTTP/HTTPS proxy

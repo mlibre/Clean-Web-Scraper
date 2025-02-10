@@ -109,7 +109,8 @@ async function electronicintifada ( enable )
 			"https://electronicintifada.net/news",
 			"https://electronicintifada.net/opinion",
 			"https://electronicintifada.net/about-ei",
-			"https://electronicintifada.net/review"
+			"https://electronicintifada.net/review",
+			"https://electronicintifada.net/artmusicculture"
 		],
 		exactExcludeList: [
 			"https://electronicintifada.net",
@@ -133,7 +134,7 @@ async function electronicintifada ( enable )
 			protocol: "http"
 		},
 		useProxyAsFallback: true,
-		crawlingDelay: 0
+		crawlingDelay: 1
 	};
 	return await runScraper( config, enable );
 }

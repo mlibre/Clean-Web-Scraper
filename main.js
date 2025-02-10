@@ -16,6 +16,7 @@ class WebScraper
 		this.maxDepth = config.maxDepth || Infinity;
 		this.maxArticles = config.maxArticles || Infinity;
 		this.crawlingDelay = config.crawlingDelay ?? 1000;
+		this.batchSize = config.batchSize || 5;
 
 		// Output paths setup
 		this.scrapResultPath = config.scrapResultPath || "./dataset";
@@ -97,82 +98,87 @@ class WebScraper
 	async crawl ( initialUrl, initialDepth = 0 )
 	{
 		const queue = [{ url: initialUrl, depth: initialDepth }];
-		for ( let i = 0; i < queue.length; i++ )
+		while ( queue.length > 0 )
 		{
-			let { url, depth } = queue[i];
-			console.log( `Processing URL: ${queue[i].url}` );
-			if ( this.hasReachedMax( depth ) )
+			const currentBatch = queue.splice( 0, this.batchSize );
+			await Promise.all( currentBatch.map( async ({ url, depth }) =>
 			{
-				continue;
-			}
-			if ( this.removeURLFragment )
-			{
-				url = url.split( "#" )[0];
-			}
-			if ( this.visited.has( url ) )
-			{
-				console.log( `Already visited: ${url}` );
-				continue;
-			}
-			this.visited.add( url );
-
-			if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
-			{
-				continue;
-			}
-
-			try
-			{
-				if ( this.crawlingDelay )
-				{
-					await WebScraper.sleep( this.crawlingDelay );
-				}
-				const data = await this.fetchContent( url );
-				if ( !data ) continue;
-
-				const dom = new JSDOM( data, { url });
-				const { document } = dom.window;
-
-				if ( !this.isExcluded( url ) )
-				{
-					const reader = new Readability( document );
-					const article = reader.parse();
-					if ( article )
-					{
-						if ( this.hasValidPageContent( article.textContent ) )
-						{
-							const metadata = this.extractMetadata( url, document );
- 							metadata.articleTitle = article.title || "";
-							this.saveArticle( url, article.textContent, metadata );
-						}
-						else
-						{
-							console.error( `Invalid content found at ${url}` );
-						}
-					}
-					else
-					{
-						console.error( `No readable content found at ${url}` );
-					}
-				}
-
-				const links = this.extractLinks( data );
-				const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
-				for ( const link of unvisitedLinks )
-				{
-					if ( !this.hasReachedMax( depth ) )
-					{
-						queue.push({ url: link, depth: depth + 1 });
-					}
-				}
-			}
-			catch ( error )
-			{
-				console.error( `Error fetching ${url}:`, error.message, error.code );
-			}
+				await this.processUrl( url, depth, queue );
+			}) );
 		}
 	}
 
+	async processUrl ( url, depth, queue )
+	{
+		console.log( `Processing URL: ${url}` );
+		if ( this.hasReachedMax( depth ) )
+		{
+			return;
+		}
+		if ( this.removeURLFragment )
+		{
+			url = url.split( "#" )[0];
+		}
+		if ( this.visited.has( url ) )
+		{
+			console.log( `Already visited: ${url}` );
+			return;
+		}
+		this.visited.add( url );
+		if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
+		{
+			return;
+		}
+		try
+		{
+			if ( this.crawlingDelay )
+			{
+				await WebScraper.sleep( this.crawlingDelay );
+			}
+			const data = await this.fetchContent( url );
+			if ( !data )
+			{
+				return;
+			}
+			const dom = new JSDOM( data, { url });
+			const { document } = dom.window;
+			if ( !this.isExcluded( url ) )
+			{
+				const reader = new Readability( document );
+				const article = reader.parse();
+				if ( article )
+				{
+					if ( this.hasValidPageContent( article.textContent ) )
+					{
+						const metadata = this.extractMetadata( url, document );
+ 						metadata.articleTitle = article.title || "";
+						this.saveArticle( url, article.textContent, metadata );
+					}
+					else
+					{
+						console.error( `Invalid content found at ${url}` );
+					}
+				}
+				else
+				{
+					console.error( `No readable content found at ${url}` );
+				}
+			}
+			const links = this.extractLinks( data );
+			const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
+			for ( const link of unvisitedLinks )
+			{
+				if ( !this.hasReachedMax( depth ) )
+				{
+					queue.push({ url: link, depth: depth + 1 });
+				}
+			}
+		}
+		catch ( error )
+		{
+			console.error( `Error fetching ${url}:`, error.message, error.code );
+		}
+	}
 
 	async fetchContent ( url )
 	{
