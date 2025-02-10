@@ -4,13 +4,13 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 
 ## ✨ Features
 
-- 🌐 Smart recursive web crawling of internal links
+- 🌐 Smart web crawling of internal links
+- 🔄 Smart retry mechanism with proxy fallback
 - 📝 Clean content extraction using Mozilla's Readability
 - 🧹 Smart content processing and cleaning
 - 🗂️ Maintains original URL structure in saved files
 - 🚫 Excludes unwanted paths from scraping
-- 🔄 Handles relative and absolute URLs like a pro
-- 🎯 No duplicate page visits
+- 🚦 Configurable rate limiting and delays
 - 🤖 AI-friendly output formats (JSONL, CSV, clean text)
 - 📊 Rich metadata extraction
 - 📁 Combine results from multiple scrapers into a unified dataset
@@ -53,6 +53,23 @@ const scraper = new WebScraper({
   jsonlOutputPath: './example.com/train.jsonl', // Optional: Custom JSONL output path
   textOutputPath: "./example.com/texts",        // Optional: Custom text output path
   csvOutputPath: "./example.com/train.csv",     // Optional: Custom CSV output path
+  strictBaseURL: true,                          // Optional: Only scrape URLs from same domain
+  maxDepth: Infinity,                           // Optional: Maximum crawling depth
+  maxArticles: Infinity,                        // Optional: Maximum articles to scrape
+  concurrencyLimit: 2,                          // Optional: Limit concurrent requests
+  crawlingDelay: 1000,                          // Optional: Delay between requests (ms)
+  
+  // Network options
+  axiosHeaders: {},                             // Optional: Custom HTTP headers
+  axiosProxy: "http://proxy:port",              // Optional: HTTP/HTTPS proxy
+  axiosMaxRetries: 5,                           // Optional: Max retry attempts
+  axiosRetryDelay: 40000,                       // Optional: Delay between retries (ms)
+  useProxyAsFallback: false,                    // Optional: Fallback to proxy on failure
+  
+  // Puppeteer options for handling dynamic content
+  usePuppeteer: false,                          // Optional: Enable Puppeteer browser
+  puppeteerProxy: "http://127.0.0.1:2080",      // Optional: Puppeteer proxy
+  puppeteerExecutablePath: "/path/to/chrome",   // Optional: Custom browser path
 });
 await scraper.start();
 ```
