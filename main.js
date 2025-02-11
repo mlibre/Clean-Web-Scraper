@@ -115,6 +115,7 @@ class WebScraper
 		{
 			return;
 		}
+		let originalUrl = url;
 		if ( this.removeURLFragment )
 		{
 			url = url.split( "#" )[0];
@@ -125,6 +126,7 @@ class WebScraper
 			return;
 		}
 		this.visited.add( url );
+		this.visited.add( originalUrl );
 		if ( !this.isValidFileType( url ) || !this.isValidDomain( url ) )
 		{
 			return;
