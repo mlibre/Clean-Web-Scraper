@@ -110,7 +110,7 @@ class WebScraper
 
 	async processUrl ( url, depth, queue )
 	{
-		console.log( `Processing URL: ${url}` );
+		console.log( `Processing URL: ${url}. Total visited: ${this.visited.size}. Total processed: ${this.allProcessedContent.length}.` );
 		if ( this.hasReachedMax( depth ) )
 		{
 			return;
