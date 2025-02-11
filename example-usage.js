@@ -230,6 +230,8 @@ async function mondoweiss ( enable )
 		useProxyAsFallback: true,
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
+		crawlingDelay: 0,
+		batchSize: 10
 	};
 	return await runScraper( config, enable );
 }
