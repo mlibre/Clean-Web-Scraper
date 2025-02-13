@@ -69,7 +69,8 @@ async function khameneiIrPalestineSpecialPage ( enable )
 {
 	// https://english.khamenei.ir/palestine-special-page/
 	const config = {
-		baseURL: "https://english.khamenei.ir/palestine-special-page/",
+		baseURL: "https://english.khamenei.ir/news",
+		startURL: "https://english.khamenei.ir/palestine-special-page",
 		maxDepth: 2,
 		exactExcludeList: [
 			"https://english.khamenei.ir/palestine-special-page/"
@@ -305,12 +306,12 @@ async function palestineremembered ( enable )
 
 void async function main ()
 {
-	const palianswersScraper = await palianswers( false );
-	const decolonizepalestineScraper = await decolonizepalestine( false );
-	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( false );
-	const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( false );
-	const electronicintifadaScraper = await electronicintifada( false );
-	const standWithPalestineScraper = await standWithPalestine( false );
+	const palianswersScraper = await palianswers( true );
+	const decolonizepalestineScraper = await decolonizepalestine( true );
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
+	const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( true );
+	const electronicintifadaScraper = await electronicintifada( true );
+	const standWithPalestineScraper = await standWithPalestine( true );
 	const mondoweisScraper = await mondoweiss( true );
 	const bdsmovementScraper = await bdsmovement( false );
 	const palestinerememberedScraper = await palestineremembered( false );
