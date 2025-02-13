@@ -37,6 +37,9 @@ git clone https://github.com/mlibre/Clean-Web-Scraper
 cd Clean-Web-Scraper
 sudo pacman -S extra/xorg-server-xvfb chromium
 npm install
+
+# Skip chromium download during npm installation
+# npm i --ignore-scripts
 ```
 
 ## 💻 Usage
