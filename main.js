@@ -152,7 +152,7 @@ class WebScraper
 				{
 					if ( this.hasValidPageContent( article.textContent ) )
 					{
-						const metadata = this.extractMetadata( url, document );
+						const metadata = this.extractMetadata( url, document, data );
  						metadata.articleTitle = article.title || "";
 						this.saveArticle( url, article.textContent, metadata );
 					}
@@ -165,6 +165,10 @@ class WebScraper
 				{
 					console.error( `No readable content found at ${url}` );
 				}
+			}
+			else
+			{
+				console.log( `Skipping excluded URL: ${url}` );
 			}
 			const links = this.extractLinks( data );
 			const unvisitedLinks = Array.from( links ).filter( link => { return !this.visited.has( link ) });
@@ -336,6 +340,7 @@ class WebScraper
 		fs.mkdirSync( dir, { recursive: true });
 		fs.writeFileSync( `${filePath}.txt`, processedContent, "utf-8" );
 		fs.writeFileSync( `${filePath}.json`, JSON.stringify( metadata, null, 2 ), "utf-8" );
+		fs.writeFileSync( `${filePath}.html`, metadata.originalHtml, "utf-8" );
 		console.log( `Saved: ${filePath}.txt` );
 		console.log( `Saved: ${filePath}.json` );
 	}
@@ -505,7 +510,7 @@ class WebScraper
 		return filteredMetadata;
 	}
 
-	extractMetadata ( url, document )
+	extractMetadata ( url, document, html )
 	{
 		return {
 			url,
@@ -519,7 +524,8 @@ class WebScraper
 			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )?.content,
 			ogImage: document.querySelector( "meta[property=\"og:image\"]" )?.content,
 			ogType: document.querySelector( "meta[property=\"og:type\"]" )?.content,
-			dateScrapedDate: new Date().toISOString()
+			dateScrapedDate: new Date().toISOString(),
+			originalHtml: html,
 		};
 	}
 
@@ -580,25 +586,36 @@ class WebScraper
 	normalizeExcludeList ( list = [] )
 	{
 		const normalizedSet = new Set();
-		for ( let i = 0; i < list.length; i++ )
+
+		for ( const item of list )
 		{
-			const item = list[i];
-			if ( item.endsWith( "/" ) )
-			{
-				normalizedSet.add( item.slice( 0, -1 ) );
-			}
-			else
+			if ( item instanceof RegExp )
 			{
 				normalizedSet.add( item );
+				continue;
 			}
-			normalizedSet.add( `${item.endsWith( "/" ) ? item : `${item }/`}` );
+
+			const withSlash = item.endsWith( "/" ) ? item : `${item }/`;
+			const withoutSlash = item.endsWith( "/" ) ? item.slice( 0, -1 ) : item;
+
+			normalizedSet.add( withSlash );
+			normalizedSet.add( withoutSlash );
 		}
+
 		return normalizedSet;
 	}
 
+
 	isExcluded ( url )
 	{
-		if ( this.exactExcludeList.has( url ) )
+		if ( Array.from( this.exactExcludeList ).some( excluded =>
+		{
+			if ( excluded instanceof RegExp )
+			{
+				return excluded.test( url );
+			}
+			return url === excluded;
+		}) )
 		{
 			return true;
 		}

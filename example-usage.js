@@ -65,6 +65,26 @@ async function khameneiIrFreePalestineTag ( enable )
 	return await runScraper( config, enable );
 }
 
+async function khameneiIrPalestineSpecialPage ( enable )
+{
+	// https://english.khamenei.ir/palestine-special-page/
+	const config = {
+		baseURL: "https://english.khamenei.ir/palestine-special-page/",
+		maxDepth: 2,
+		exactExcludeList: [
+			"https://english.khamenei.ir/palestine-special-page/"
+		],
+		scrapResultPath: "./dataset/khamenei-ir-palestine-special-page/website",
+		jsonlOutputPath: "./dataset/khamenei-ir-palestine-special-page/train.jsonl",
+		textOutputPath: "./dataset/khamenei-ir-palestine-special-page/texts",
+		csvOutputPath: "./dataset/khamenei-ir-palestine-special-page/train.csv",
+		includeMetadata: true,
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
+		axiosRetryDelay: 10000
+	};
+	return await runScraper( config, enable );
+}
+
 async function decolonizepalestine ( enable )
 {
 	const config = {
@@ -187,26 +207,8 @@ async function mondoweiss ( enable )
 			"https://mondoweiss.net/activism/",
 			"https://mondoweiss.net/news-letters/",
 			"https://mondoweiss.net/newsletters",
-			"https://mondoweiss.net/2006/",
-			"https://mondoweiss.net/2007/",
-			"https://mondoweiss.net/2008/",
-			"https://mondoweiss.net/2009/",
-			"https://mondoweiss.net/2010/",
-			"https://mondoweiss.net/2011/",
-			"https://mondoweiss.net/2012/",
-			"https://mondoweiss.net/2013/",
-			"https://mondoweiss.net/2014/",
-			"https://mondoweiss.net/2015/",
-			"https://mondoweiss.net/2016/",
-			"https://mondoweiss.net/2017/",
-			"https://mondoweiss.net/2018/",
-			"https://mondoweiss.net/2019/",
-			"https://mondoweiss.net/2020/",
-			"https://mondoweiss.net/2021/",
-			"https://mondoweiss.net/2022/",
-			"https://mondoweiss.net/2023/",
-			"https://mondoweiss.net/2024/",
-			"https://mondoweiss.net/2025/",
+			/^https:\/\/mondoweiss\.net\/\d{4}\/\d{2}$/,
+			/^https:\/\/mondoweiss\.net\/\d{4}\/$/,
 			"https://mondoweiss.net/daily-headlines",
 			"https://mondoweiss.net/palestineletter",
 			"https://mondoweiss.net/podcasts/",
@@ -306,6 +308,7 @@ void async function main ()
 	const palianswersScraper = await palianswers( false );
 	const decolonizepalestineScraper = await decolonizepalestine( false );
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( false );
+	const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( false );
 	const electronicintifadaScraper = await electronicintifada( false );
 	const standWithPalestineScraper = await standWithPalestine( false );
 	const mondoweisScraper = await mondoweiss( true );
@@ -316,8 +319,10 @@ void async function main ()
 		palianswersScraper,
 		decolonizepalestineScraper,
 		khameneiIrFreePalestineTagScraper,
+		khameneiIrPalestineSpecialPageScraper,
 		electronicintifadaScraper,
 		standWithPalestineScraper,
 		mondoweisScraper
 	] );
+	// QLoRA = LoRA with 4-bit quantization
 }();

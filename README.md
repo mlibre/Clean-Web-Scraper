@@ -48,7 +48,8 @@ const scraper = new WebScraper({
   baseURL: 'https://example.com/news',          // Required: The website base url to scrape
   startURL: 'https://example.com/blog',         // Optional: Custom starting URL
   excludeList: ['/admin', '/private'],          // Optional: Paths to exclude
-  exactExcludeList: ['/specific-page'],         // Optional: Exact URLs to exclude
+  exactExcludeList: ['/specific-page',          // Optional: Exact URLs to exclude 
+  /^https:\/\/host\.com\/\d{4}\/$/],            // Optional: Regex patterns to exclude. this will exclude urls likee https://host.com/2023/
   scrapResultPath: './example.com/website',     // Required: Where to save the content
   jsonlOutputPath: './example.com/train.jsonl', // Optional: Custom JSONL output path
   textOutputPath: "./example.com/texts",        // Optional: Custom text output path
