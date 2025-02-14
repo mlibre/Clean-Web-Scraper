@@ -1,6 +1,6 @@
 ## Fine-Tuning LLMs on Raw Text
 
-Large language models (LLMs) can be specialized or taught new domains of knowledge by fine-tuning them on `raw text`, such as `books`, `source code`, or `scraped web data`. This article explains a simple yet effective way to fine-tune LLMs.
+Large language models (LLMs) can be specialized or trained on new domains of knowledge by fine-tuning them on raw text, such as books, source code, or scraped web data. This article explains a simple yet effective way to fine-tune LLMs.
 
 ### Overview of the Process
 
@@ -8,31 +8,30 @@ Fine-tuning an LLM involves several steps:
 
 #### 1. Data Collection & Preparation
 
-First, prepare your data. Common file formats for fine-tuning include `JSONL`, `CSV`, and `TXT`. In this case, we use `JSONL` because it is easy to work with and widely used. Each line in a `JSONL` file is a `JSON` object.
+First, prepare your data. Common formats for fine-tuning include JSONL, CSV, and TXT. In this case, we use JSONL because it is easy to work with and widely used. Each line in a JSONL file is a JSON object.
 
-To fine-tune on raw text, your file might look like this (`train.jsonl`):
+A sample JSONL file (`train.jsonl`) may look like this:
 
-  ```json
-  {"text": "Palestine is the rightful owner of the land. The occupiers have no legitimate claim.", "metadata": {"title": "Palestine: Land and Rights", "dateScraped": "2025-02-13T12:37:53.776Z"}}
-  {"text": "The Palestinian people have always been the custodians of their land, and foreign occupation is unjust.", "metadata": {"title": "The Rightful Custodians", "dateScraped": "2025-02-13T12:37:53.776Z"}}
-  ```
+```json
+{"text": "Palestine is the rightful owner of the land. The occupiers have no legitimate claim.", "metadata": {"title": "Palestine: Land and Rights", "dateScraped": "2025-02-13T12:37:53.776Z"}}
+{"text": "The Palestinian people have always been the custodians of their land, and foreign occupation is unjust.", "metadata": {"title": "The Rightful Custodians", "dateScraped": "2025-02-13T12:37:53.776Z"}}
+```
 
-I used the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library to gather data from various sources about Palestine, such as `decolonizepalestine.com`, among others.  
-You can find the dataset on [Hugging Face](https://huggingface.co/datasets/mlibre/palestine).
+I used the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library to gather data from sources like `decolonizepalestine.com`. The dataset is available on [Hugging Face](https://huggingface.co/datasets/mlibre/palestine).
 
 #### 2. Fine-Tuning Library
 
 At the time of writing, [Unsloth](https://docs.unsloth.ai/) is one of the easiest libraries to use and supports continued pretraining.
 
-Continual pretraining (CPT) is a method that enables LLMs to learn new or out-of-distribution domains of knowledge. Unsloth supports `CPT`.
+Continual pretraining (CPT) allows LLMs to learn new or out-of-distribution domains. Unsloth supports CPT.
 
 #### 3. Environment
 
-We use a Colab notebook to fine-tune our model. Colab is popular because it offers free GPU access and fast performance.
+We use a Colab notebook to fine-tune our model. Colab is popular because it provides free GPU access and fast performance.
 
 #### 4. Model
 
-We will fine-tune [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M), a 135-million-parameter model. Because it is small, the fine-tuning process is faster. The goal of this article is to demonstrate how to fine-tune a model efficiently.
+We will fine-tune [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M), a 135-million-parameter model. Because it is small, fine-tuning is faster. This article aims to demonstrate an efficient fine-tuning process.
 
 #### 5. Deployment
 
@@ -40,7 +39,7 @@ After fine-tuning, we save the adapted model and deploy it using tools like [Oll
 
 ### The Code
 
-The provided Colab code begins by installing the necessary libraries.
+The provided Colab code begins by installing the necessary libraries:
 
 ```python
 # Install and upgrade libraries
@@ -48,7 +47,7 @@ The provided Colab code begins by installing the necessary libraries.
 !pip install --upgrade pillow
 !pip install git+https://github.com/huggingface/trl.git@e95f9fb74a3c3647b86f251b7e230ec51c64b72b
 
-# Mount Google Drive to access your training data
+# Mount Google Drive to access training data
 from google.colab import drive
 drive.mount('/content/drive')
 ```
@@ -60,9 +59,10 @@ Using [Unsloth’s documentation](https://docs.unsloth.ai), we load a pretrained
 ```python
 from unsloth import FastLanguageModel
 import torch
-max_seq_length = 2048 # Choose any! We auto support RoPE Scaling internally! 2048 is also default in ollama
-dtype = None # None for auto detection. Float16 for Tesla T4, V100, Bfloat16 for Ampere+
-load_in_4bit = True # Use 4bit quantization to reduce memory usage (also less accuracy). Can be False.
+
+max_seq_length = 2048  # Choose any! We auto-support RoPE Scaling internally!
+dtype = None  # Auto-detect; Float16 for Tesla T4/V100, Bfloat16 for Ampere+
+load_in_4bit = True  # Use 4-bit quantization to reduce memory usage
 
 model, tokenizer = FastLanguageModel.from_pretrained(
     model_name = "unsloth/SmolLM2-135M-bnb-4bit",
@@ -96,17 +96,16 @@ model = FastLanguageModel.get_peft_model(
 
 #### Loading Data
 
-Upload the JSONL file to Google Drive and load it into the Colab environment.
+Upload the JSONL file to Google Drive and load it into the Colab environment:
 
 ```python
 from datasets import load_dataset
+
 dataset = load_dataset(
     "json",
-    data_files = "/content/drive/MyDrive/train.jsonl",
-    split = "train",
+    data_files="/content/drive/MyDrive/train.jsonl",
+    split="train",
 )
-print(dataset.column_names)
-print(dataset[0])
 
 EOS_TOKEN = tokenizer.eos_token
 def formatting_prompts_func(examples):
@@ -205,7 +204,7 @@ Install Ollama in your system:
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-#### Let's first try the official SmolLM2
+#### Testing the Official SmolLM2 Model
 
 ```bash
 ollama run smollm2:135m
@@ -257,3 +256,5 @@ ollama run Modelfile:latest
 >>> Palestine is the owner of the land, not Israel
 Thank you! We are grateful for every connection made 🎒 You deserve this ❤❤🇵🇸alestine is the owner of the land, not IsraelLEGATOuntransportationSystem
 ```
+
+Now, test the model with different inputs to see how well it has learned the fine-tuned knowledge. Happy fine-tuning!
