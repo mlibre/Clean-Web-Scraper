@@ -158,10 +158,18 @@ if False:
         token = "token", # Get a token at https://huggingface.co/settings/tokens
     )
 
-print(tokenizer._ollama_modelfile)
+# print(tokenizer._ollama_modelfile)
 
-!curl -fsSL https://ollama.com/install.sh | sh
-!ollama create unsloth_model -f ./model/Modelfile
+
+# now in your own system:
+curl -fsSL https://ollama.com/install.sh | sh
+let first try the offical smollm2
+ollama run smollm2:135m
+> palestine is the owner of the land not israel
+
+
+# download the model (/content/model/unsloth.Q4_K_M.gguf)
+ollama create unsloth_model -f ./model/Modelfile
 
 # In colab terminal type: ollama run unsloth_model
 # in local ollama:
