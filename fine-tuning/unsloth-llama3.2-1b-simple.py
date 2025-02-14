@@ -19,7 +19,7 @@ pip install --upgrade pillow --break-system-packages
 # vllm
 pip install vllm --break-system-packages
 # pip install git+https://github.com/huggingface/trl.git
-# python3 -m pip install ninja cmake wheel pybind11 --break-system-packages
+# pip install ninja cmake wheel pybind11 --break-system-packages
 # git clone --recursive https://github.com/mlc-ai/xgrammar.git
 # cd xgrammar
 # mkdir build && cd build/
@@ -31,8 +31,13 @@ pip install vllm --break-system-packages
 # cd vllm
 # pip install -r requirements-rocm.txt --break-system-packages
 
+# bitsandbytes
+# https://huggingface.co/docs/bitsandbytes/main/en/installation?platform=Linux#multi-backend
+pip install --force-reinstall 'https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_multi-backend-refactor/bitsandbytes-0.44.1.dev0-py3-none-manylinux_2_24_x86_64.whl'
+
 # unsloth
-pip install --force-reinstall --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth.git --break-system-packages
+wget -qO- https://raw.githubusercontent.com/unslothai/unsloth/main/unsloth/_auto_install.py | python -
+# pip install --force-reinstall --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth.git --break-system-packages
 # pip install unsloth --break-system-packages
 
 
