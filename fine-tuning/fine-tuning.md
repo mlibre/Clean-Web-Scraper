@@ -1,6 +1,9 @@
 ## Fine-Tuning LLMs on Raw Text
 
-Large language models (LLMs) can be specialized or trained on new domains of knowledge by fine-tuning them on raw text, such as books, source code, or scraped web data. This article explains a simple yet effective way to fine-tune LLMs.
+Fine-tuning large language models (LLMs) on raw text allows them to specialize in new knowledge domains. This guide walks you through fine-tuning an LLM using JSONL-formatted data, covering data preparation, model training, and deployment. We use the [Unsloth](https://docs.unsloth.ai/) library for efficient fine-tuning and demonstrate training on the [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M) model. The final model can be deployed with [Ollama](https://github.com/ollama/ollama) for local inference.  
+
+You can find the full code and implementation details here:  
+🔗 [GitHub Repository](https://github.com/mlibre/Clean-Web-Scraper/tree/main/fine-tuning)  
 
 ### Overview of the Process
 
@@ -42,10 +45,11 @@ After fine-tuning, we save the adapted model and deploy it using tools like [Oll
 The provided Colab code begins by installing the necessary libraries:
 
 ```python
-# Install and upgrade libraries
 !pip install unsloth vllm
 !pip install --upgrade pillow
-!pip install git+https://github.com/huggingface/trl.git@e95f9fb74a3c3647b86f251b7e230ec51c64b72b
+
+# Install trl if needed
+# !pip install git+https://github.com/huggingface/trl.git@e95f9fb74a3c3647b86f251b7e230ec51c64b72b
 
 # Mount Google Drive to access training data
 from google.colab import drive
@@ -162,6 +166,8 @@ trainer_stats = trainer.train()
 
 #### Saving the Model
 
+`Unsloth` automatically saves the fine-tuned model and the `Ollama Modelfile` in the `model` directory in Colab. So you don’t need to create it manually. However in my case, `Unsloth` was unable to generate the `Modelfile` automatically, so you i did create it manually from the `Modelfile`.
+
 ```python
 # saves the LoRA adapters, and not the full model. To save to 16bit or GGUF, scroll down!
 model.save_pretrained("lora_model") # Local saving
@@ -194,7 +200,7 @@ if False:
 
 ```
 
-Now go to the model folder and download the model (unsloth.Q4_K_M.gguf file)
+Now go to the model folder and download the model (`unsloth.Q4_K_M.gguf` file)
 
 ### Let test our model
 
@@ -221,6 +227,7 @@ history of conflict, often marked by violence and occupation.
 #### Now lets test our model
 
 ```bash
+ollama show --modelfile smollm2:135m
 nano Modelfile
 
 FROM /usr/share/ollama/.ollama/models/blobs/sha256-f535f83ec568d040f88ddc04a199fa6da90923bbb41d4dcaed02caa924d6ef57
