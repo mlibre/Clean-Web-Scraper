@@ -78,10 +78,9 @@ This method allows for memory efficiency while updating the model's parameters.
 ```python
 from unsloth import FastLanguageModel
 import torch
-
-max_seq_length = 2048  # Choose any! Unsloth’s auto-support RoPE Scaling internally!
-dtype = None  # Auto-detect
-load_in_4bit = True  # Use 4-bit quantization to reduce memory usage
+max_seq_length = 2048 # Choose any! Unsloth auto support RoPE Scaling internally!
+dtype = None # None for auto detection
+load_in_4bit = True # Use 4bit quantization to reduce memory usage (also less accuracy). Can be False.
 
 model, tokenizer = FastLanguageModel.from_pretrained(
     model_name = "unsloth/SmolLM2-135M-bnb-4bit",
@@ -107,7 +106,7 @@ model = FastLanguageModel.get_peft_model(
     bias = "none",    # Supports any, but = "none" is optimized
     use_gradient_checkpointing = "unsloth", # True or "unsloth" for very long context
     random_state = 3407,
-    use_rslora = True,  # unsloth supports rank stabilized LoRA
+    use_rslora = True,  # unsloth support rank stabilized LoRA
     loftq_config = None, # And LoftQ
 )
 ```
@@ -125,11 +124,10 @@ drive.mount('/content/drive')
 
 # Load the dataset
 from datasets import load_dataset
-
 dataset = load_dataset(
     "json",
-    data_files="/content/drive/MyDrive/train.jsonl",
-    split="train",
+    data_files = "/content/drive/MyDrive/train.jsonl",
+    split = "train",
 )
 
 EOS_TOKEN = tokenizer.eos_token
@@ -195,10 +193,22 @@ Once training is complete, we save the fine-tuned model.
 For **quantized GGUF format**, use:  
 
 ```python
-model.save_pretrained("lora_model")  
+# saves the LoRA adapters, and not the full model. To save to 16bit or GGUF, scroll down!
+model.save_pretrained("lora_model") # Local saving
 tokenizer.save_pretrained("lora_model")
 
-model.save_pretrained_gguf("model", tokenizer, quantization_method = "q4_k_m")
+# Save to 8bit Q8_0
+if False: model.save_pretrained_gguf("model", tokenizer,)
+# Remember to go to https://huggingface.co/settings/tokens for a token!
+# And change your username from mlibre to your username!!
+if False: model.push_to_hub_gguf("mlibre/model", tokenizer, token = "token")
+
+# Save to 16bit GGUF
+if False: model.save_pretrained_gguf("model", tokenizer, quantization_method = "f16")
+if False: model.push_to_hub_gguf("mlibre/model", tokenizer, quantization_method = "f16", token = "token")
+
+# Save to q4_k_m GGUF
+if True: model.save_pretrained_gguf("model", tokenizer, quantization_method = "q4_k_m")
 if False: model.push_to_hub_gguf("mlibre/model", tokenizer, quantization_method = "q4_k_m", token = "token")
 
 # Save to multiple GGUF options - much faster if you want multiple!
@@ -209,7 +219,6 @@ if False:
         quantization_method = ["q4_k_m", "q8_0", "q5_k_m",],
         token = "token", # Get a token at https://huggingface.co/settings/tokens
     )
-
 ```
 
 Now go to the model folder and download the model file (`unsloth.Q4_K_M.gguf`).
