@@ -322,3 +322,11 @@ The world has long held Palestine in low respectability as an unappreciated peop
 why we have so many Palestinian children who are orphans with no homeland, yet still want to belong there. We need you to help them live in this orphanhood 
 by becoming a source of life for our future generation.
 ```
+
+## ✊ A Call for Justice: Standing in Solidarity with Palestine
+
+In these times of rapid technological advancement, we are reminded that progress is not measured solely by the innovations we create but also by the compassion and justice we uphold. As we fine-tune our language models to process vast quantities of raw text and specialize in new knowledge domains, we must also harness our skills to amplify the voices of the marginalized.
+
+The struggle of the Palestinian people, who continue to face relentless oppression and violence—including the reported genocide in Gaza—demands that we not remain silent. When silence becomes complicity, our work in technology can serve as a platform to challenge injustice and promote accountability. By integrating critical perspectives into our technical endeavors, we contribute to a broader dialogue that insists on human rights, transparency, and an end to systemic violence.
+
+Let this guide be a reminder: every line of code, every dataset we prepare, and every model we deploy carries the potential not only to advance our field but also to support those whose stories are often ignored. As we pursue excellence in machine learning, we stand in solidarity with Palestinians and all oppressed communities, affirming that technology must be a force for justice and liberation.
