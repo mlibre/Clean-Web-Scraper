@@ -221,7 +221,7 @@ if False:
     )
 ```
 
-Now go to the model folder and download the model file (`unsloth.Q4_K_M.gguf`).
+Now, go to the model folder and download the new model (**unsloth.Q4_K_M.gguf**) along with the Ollama **Modelfile**.
 
 ---
 
@@ -238,6 +238,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 ### 📝 Step 2: Create the Modelfile  
 
 To run GGUF models on ollama, we first must create a **Modelfile** taht tells Ollama how to run the model.  
+If the Modelfile was not available for download in Colab for any reason, you can create it manually.  
 Navigate to the model folder and **create a new file named `Modelfile`**:  
 
 ```bash
