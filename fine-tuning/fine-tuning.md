@@ -2,7 +2,7 @@
 
 Fine-tuning large language models (LLMs) on raw text allows them to specialize in new knowledge domains.  
 This guide walks you through fine-tuning an LLM using JSONL-formatted data, covering data preparation, model training, and deployment.  
-I use the [Unsloth](https://docs.unsloth.ai/) library for efficient fine-tuning and demonstrate on a small [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M).  
+We use the [Unsloth](https://docs.unsloth.ai/) library for efficient fine-tuning and demonstrate on a small [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M).  
 The final model can be deployed with [Ollama](https://github.com/ollama/ollama) for local inference.  
 
 📌 **Full Code & Implementation Details**: [GitHub Repository](https://github.com/mlibre/Clean-Web-Scraper/tree/main/fine-tuning)  
@@ -13,7 +13,7 @@ The final model can be deployed with [Ollama](https://github.com/ollama/ollama) 
 
 Fine-tuning an LLM involves several steps:  
 
-### 1️⃣ Data Collection & Preparation  
+### 1️⃣ Data Collection & Preparation
 
 First, prepare your dataset in a structured format. Common formats for fine-tuning include **JSONL, CSV, and TXT**.  
 In this guide, we use **JSONL** because it's easy to work with and widely used.  
@@ -25,8 +25,8 @@ In this guide, we use **JSONL** because it's easy to work with and widely used.
 {"text": "The Renaissance period saw a resurgence of art, science, and philosophy in Europe.", "metadata": {"title": "The Renaissance", "dateScraped": "2025-02-13T12:37:53.776Z"}}
 ```
 
-To scrape data efficiently, I used the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library.  
-This **Nodejs** library extract articles from websites, cleans it, and saves it in `JSONL` format.  
+To scrape data efficiently, we use the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library.  
+This **Node.js** library extracts articles from websites, cleans them, and saves them in `JSONL` format.  
 The dataset is available on [Hugging Face](https://huggingface.co/datasets/mlibre/palestine).  
 
 ---
@@ -34,27 +34,33 @@ The dataset is available on [Hugging Face](https://huggingface.co/datasets/mlibr
 ### 2️⃣ Fine-Tuning Library – **Why Unsloth?** 🦥  
 
 At the time of writing, [Unsloth](https://docs.unsloth.ai/) is one of the **fastest and most memory-efficient** fine-tuning libraries available.  
-It supports **fine tuning and Continued Pretraining (CPT)**, allowing LLMs to learn **new knowledge domains** efficiently.  
+It supports **fine-tuning and Continued Pretraining (CPT)**, allowing LLMs to learn **new knowledge domains** efficiently.  
 
 ---
 
 ### 3️⃣ Setting Up the Training Environment 🖥️  
 
-I used **Google Colab** for training, as it provides free GPU access.
+We use **Google Colab** for training, as it provides free GPU access.  
 
 ---
 
 ### 4️⃣ The Model 🏗️  
 
-I used **SmolLM2-135M**, a very small 135M-parameter model, for fine-tuning. To optimize memory, we will load the model with **4-bit quantization** using `Unsloth`.
+We use **SmolLM2-135M**, a very small 135M-parameter model, for fine-tuning. To optimize memory, we load the model in **4-bit quantization** using `Unsloth`.
 
-### 4️⃣ Deployment with Ollama
+---
 
-After fine-tuning, we save the new model and deploy it using [Ollama](https://github.com/ollama/ollama).
+### 5️⃣ Deployment with Ollama
 
-## The Code
+After fine-tuning, we save the new model and deploy it using [Ollama](https://github.com/ollama/ollama).  
 
-The provided Colab code begins by installing the necessary libraries:
+---
+
+## 💻 The Code  
+
+The provided Colab code includes all the steps to fine-tune the model.
+
+### Installing Dependencies
 
 ```python
 !pip install unsloth vllm
@@ -139,7 +145,7 @@ print(dataset[0])
 
 ### Training the Model 🚴‍♂️  
 
-Fine-tuning is managed with [UnslothTrainer](https://docs.unsloth.ai), allowing optimization of batch size, learning rate, and epochs.  
+Fine-tuning is managed with `UnslothTrainer`, allowing optimization of batch size, learning rate, and epochs.  
 
 ```python
 from trl import SFTTrainer
