@@ -1,6 +1,9 @@
 # Fine-Tuning LLMs on Raw Text
 
-Fine-tuning large language models (LLMs) on raw text allows them to specialize in new knowledge domains. This guide walks you through fine-tuning an LLM using JSONL-formatted data, covering data preparation, model training, and deployment. We use the [Unsloth](https://docs.unsloth.ai/) library for efficient fine-tuning and demonstrate training on the [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M) model. The final model can be deployed with [Ollama](https://github.com/ollama/ollama) for local inference.  
+Fine-tuning large language models (LLMs) on raw text allows them to specialize in new knowledge domains.  
+This guide walks you through fine-tuning an LLM using JSONL-formatted data, covering data preparation, model training, and deployment.  
+I use the [Unsloth](https://docs.unsloth.ai/) library for efficient fine-tuning and demonstrate on a small [SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M).  
+The final model can be deployed with [Ollama](https://github.com/ollama/ollama) for local inference.  
 
 📌 **Full Code & Implementation Details**: [GitHub Repository](https://github.com/mlibre/Clean-Web-Scraper/tree/main/fine-tuning)  
 
@@ -12,7 +15,8 @@ Fine-tuning an LLM involves several steps:
 
 ### 1️⃣ Data Collection & Preparation  
 
-First, prepare your dataset in a structured format. Common formats for fine-tuning include **JSONL, CSV, and TXT**. In this guide, we use **JSONL** because it's easy to work with and widely used in NLP.  
+First, prepare your dataset in a structured format. Common formats for fine-tuning include **JSONL, CSV, and TXT**.  
+In this guide, we use **JSONL** because it's easy to work with and widely used.  
 
 📄 **Sample JSONL file (`train.jsonl`)**:  
 
@@ -21,13 +25,16 @@ First, prepare your dataset in a structured format. Common formats for fine-tuni
 {"text": "The Renaissance period saw a resurgence of art, science, and philosophy in Europe.", "metadata": {"title": "The Renaissance", "dateScraped": "2025-02-13T12:37:53.776Z"}}
 ```
 
-To scrape data efficiently, I used the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library. The dataset is available on [Hugging Face](https://huggingface.co/datasets/mlibre/palestine).  
+To scrape data efficiently, I used the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library.  
+This **Nodejs** library extract articles from websites, cleans it, and saves it in `JSONL` format.  
+The dataset is available on [Hugging Face](https://huggingface.co/datasets/mlibre/palestine).  
 
 ---
 
 ### 2️⃣ Fine-Tuning Library – **Why Unsloth?** 🦥  
 
-At the time of writing, [Unsloth](https://docs.unsloth.ai/) is one of the **fastest and most memory-efficient** fine-tuning libraries available. It supports **Continual Pretraining (CPT)**, allowing LLMs to learn **new knowledge domains** efficiently.  
+At the time of writing, [Unsloth](https://docs.unsloth.ai/) is one of the **fastest and most memory-efficient** fine-tuning libraries available.  
+It supports **fine tuning and Continued Pretraining (CPT)**, allowing LLMs to learn **new knowledge domains** efficiently.  
 
 ---
 
@@ -37,13 +44,13 @@ I used **Google Colab** for training, as it provides free GPU access.
 
 ---
 
-### 4️⃣ Loading & Preparing the Model 🏗️  
+### 4️⃣ The Model 🏗️  
 
-I used **SmolLM2-135M**, a compact 135M-parameter model, for fine-tuning. To optimize memory, I load the model with **4-bit quantization** using Unsloth
+I used **SmolLM2-135M**, a very small 135M-parameter model, for fine-tuning. To optimize memory, we will load the model with **4-bit quantization** using `Unsloth`.
 
 ### 4️⃣ Deployment with Ollama
 
-After fine-tuning, we save the adapted model and deploy it using tools like [Ollama](https://github.com/ollama/ollama).
+After fine-tuning, we save the new model and deploy it using [Ollama](https://github.com/ollama/ollama).
 
 ## The Code
 
@@ -55,22 +62,19 @@ The provided Colab code begins by installing the necessary libraries:
 
 # Install trl if needed
 # !pip install git+https://github.com/huggingface/trl.git@e95f9fb74a3c3647b86f251b7e230ec51c64b72b
-
-# Mount Google Drive to access training data
-from google.colab import drive
-drive.mount('/content/drive')
 ```
 
 ### Loading and Preparing the Model
 
-Using [Unsloth’s documentation](https://docs.unsloth.ai), we load a pretrained model (a 4-bit quantized version of SmolLM2-135M) and set it up for fine-tuning with LoRA. This method allows for memory efficiency while updating the model's parameters.
+Using [Unsloth’s documentation](https://docs.unsloth.ai), we load a pretrained model (a 4-bit quantized version of SmolLM2-135M) and set it up for fine-tuning with LoRA.  
+This method allows for memory efficiency while updating the model's parameters.
 
 ```python
 from unsloth import FastLanguageModel
 import torch
 
-max_seq_length = 2048  # Choose any! We auto-support RoPE Scaling internally!
-dtype = None  # Auto-detect; Float16 for Tesla T4/V100, Bfloat16 for Ampere+
+max_seq_length = 2048  # Choose any! Unsloth’s auto-support RoPE Scaling internally!
+dtype = None  # Auto-detect
 load_in_4bit = True  # Use 4-bit quantization to reduce memory usage
 
 model, tokenizer = FastLanguageModel.from_pretrained(
@@ -95,10 +99,9 @@ model = FastLanguageModel.get_peft_model(
     
     lora_dropout = 0, # Supports any, but = 0 is optimized
     bias = "none",    # Supports any, but = "none" is optimized
-    # [NEW] "unsloth" uses 30% less VRAM, fits 2x larger batch sizes!
     use_gradient_checkpointing = "unsloth", # True or "unsloth" for very long context
     random_state = 3407,
-    use_rslora = True,  # We support rank stabilized LoRA
+    use_rslora = True,  # unsloth supports rank stabilized LoRA
     loftq_config = None, # And LoftQ
 )
 ```
@@ -110,6 +113,11 @@ model = FastLanguageModel.get_peft_model(
 Upload the JSONL dataset to Google Drive and load it into Colab:  
 
 ```python
+# Mount Google Drive to access training data
+from google.colab import drive
+drive.mount('/content/drive')
+
+# Load the dataset
 from datasets import load_dataset
 
 dataset = load_dataset(
@@ -177,16 +185,13 @@ trainer_stats = trainer.train()
 
 ### Saving & Exporting the Model 💾  
 
-Once training is complete, we save the fine-tuned model:  
+Once training is complete, we save the fine-tuned model.  
+For **quantized GGUF format**, use:  
 
 ```python
 model.save_pretrained("lora_model")  
 tokenizer.save_pretrained("lora_model")
-```
 
-For **quantized GGUF format**, use:  
-
-```python
 model.save_pretrained_gguf("model", tokenizer, quantization_method = "q4_k_m")
 if False: model.push_to_hub_gguf("mlibre/model", tokenizer, quantization_method = "q4_k_m", token = "token")
 
@@ -201,7 +206,7 @@ if False:
 
 ```
 
-Now go to the model folder and download the model (`unsloth.Q4_K_M.gguf` file)
+Now go to the model folder and download the model file (`unsloth.Q4_K_M.gguf`).
 
 ---
 
@@ -209,13 +214,16 @@ Now go to the model folder and download the model (`unsloth.Q4_K_M.gguf` file)
 
 ### 📥 Step 1: Install Ollama  
 
+Ollama is a lightweight, open-source LLM server that allows you to run and deploy models locally.
+
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
 ### 📝 Step 2: Create the Modelfile  
 
-The **Modelfile** tells Ollama how to run/create the model. Navigate to the model folder and **create a new file named `Modelfile`**:  
+To run GGUF models on ollama, we first must create a **Modelfile** taht tells Ollama how to run the model.  
+Navigate to the model folder and **create a new file named `Modelfile`**:  
 
 ```bash
 nano Modelfile
@@ -252,6 +260,12 @@ PARAMETER stop <|im_end|>
 ```
 
 Save and close the file.  
+If you wonder where I did find the `Modelfile` template, it’s from the original SmolLM2.  
+You can show it with this command:
+
+```bash
+ollama show --modelfile smollm2:135m
+```
 
 ### 🏃 Step 3: Create & Run the Model  
 
@@ -274,7 +288,7 @@ ollama run smollm2:135m
 
 Example output:  
 
-```
+```text
 The Renaissance was a cultural movement in Europe that saw significant advancements in art, science, and philosophy.
 ```
 
@@ -286,14 +300,6 @@ ollama run Modelfile:latest
 
 Example output:  
 
-```
+```text
 The Renaissance period was marked by extraordinary artistic achievements, with figures like Leonardo da Vinci and Michelangelo redefining creative expression.
 ```
-
----
-
-## 🎉 Conclusion  
-
-Fine-tuning LLMs allows models to specialize in specific topics efficiently. Using **Unsloth for fine-tuning** and **Ollama for local deployment**, you can train and run lightweight models on custom datasets.  
-
-🚀 **Try fine-tuning your own model and experiment with different datasets!** Happy coding! 🦾  
