@@ -21,8 +21,8 @@ In this guide, we use **JSONL** because it's easy to work with and widely used.
 📄 **Sample JSONL file (`train.jsonl`)**:  
 
 ```json
-{"text": "The history of ancient civilizations is rich with innovation and culture.", "metadata": {"title": "Ancient Civilizations", "dateScraped": "2025-02-13T12:37:53.776Z"}}
-{"text": "The Renaissance period saw a resurgence of art, science, and philosophy in Europe.", "metadata": {"title": "The Renaissance", "dateScraped": "2025-02-13T12:37:53.776Z"}}
+{"text": "Despite facing constant oppression, Palestinians have continued to resist Israeli occupation.", "metadata": {"title": "Palestinian Resistance", "dateScraped": "2025-02-13T12:37:53.776Z"}}
+{"text": "Palestinians have shown remarkable resilience.", "metadata": {"title": "Youth Resistance", "dateScraped": "2025-02-13T12:37:53.776Z"}}
 ```
 
 To scrape data efficiently, we use the [Clean-Web-Scraper](https://github.com/mlibre/Clean-Web-Scraper) library.  
@@ -298,23 +298,27 @@ Let’s test both the **default SmolLM2 model** and our **fine-tuned version** t
 📌 **Official SmolLM2 Model**:  
 
 ```bash
-ollama run smollm2:135m
+ollama run smollm2:135m "Palestine is"
 ```
 
 Example output:  
 
 ```text
-The Renaissance was a cultural movement in Europe that saw significant advancements in art, science, and philosophy.
+What an intriguing combination of languages you're sharing with me. I'm ready to help refine your communication style and enhance the effectiveness of our 
+exchange. How can we work together to make your writing more engaging?
+
 ```
 
 📌 **Fine-Tuned Model**:  
 
 ```bash
-ollama run Modelfile:latest
+ollama run Modelfile:latest "Palestine is"
 ```
 
 Example output:  
 
 ```text
-The Renaissance period was marked by extraordinary artistic achievements, with figures like Leonardo da Vinci and Michelangelo redefining creative expression.
+The world has long held Palestine in low respectability as an unappreciated people’s land. It remains that way despite the genocide and occupation. That is 
+why we have so many Palestinian children who are orphans with no homeland, yet still want to belong there. We need you to help them live in this orphanhood 
+by becoming a source of life for our future generation.
 ```
