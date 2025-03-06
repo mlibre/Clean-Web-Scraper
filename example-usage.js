@@ -306,24 +306,23 @@ async function palestineremembered ( enable )
 
 void async function main ()
 {
-	const palianswersScraper = await palianswers( true );
-	const decolonizepalestineScraper = await decolonizepalestine( true );
+	// const palianswersScraper = await palianswers( true );
+	// const decolonizepalestineScraper = await decolonizepalestine( true );
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
-	const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( true );
-	const electronicintifadaScraper = await electronicintifada( true );
-	const standWithPalestineScraper = await standWithPalestine( true );
-	const mondoweisScraper = await mondoweiss( true );
-	const bdsmovementScraper = await bdsmovement( false );
-	const palestinerememberedScraper = await palestineremembered( false );
+	// const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( true );
+	// const electronicintifadaScraper = await electronicintifada( true );
+	// const standWithPalestineScraper = await standWithPalestine( true );
+	// const mondoweisScraper = await mondoweiss( true );
+	// const bdsmovementScraper = await bdsmovement( false );
+	// const palestinerememberedScraper = await palestineremembered( false );
 
-	await WebScraper.combineResults( "./dataset/combined", [
-		palianswersScraper,
-		decolonizepalestineScraper,
-		khameneiIrFreePalestineTagScraper,
-		khameneiIrPalestineSpecialPageScraper,
-		electronicintifadaScraper,
-		standWithPalestineScraper,
-		mondoweisScraper
-	] );
-	// QLoRA = LoRA with 4-bit quantization
+	// await WebScraper.combineResults( "./dataset/combined", [
+	// 	palianswersScraper,
+	// 	decolonizepalestineScraper,
+	// 	khameneiIrFreePalestineTagScraper,
+	// 	khameneiIrPalestineSpecialPageScraper,
+	// 	electronicintifadaScraper,
+	// 	standWithPalestineScraper,
+	// 	mondoweisScraper
+	// ] );
 }();
