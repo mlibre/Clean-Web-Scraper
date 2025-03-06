@@ -1,6 +1,6 @@
 {
   "name": "clean-web-scraper",
-  "version": "4.1.6",
+  "version": "4.1.7",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
