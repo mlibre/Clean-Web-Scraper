@@ -1,8 +1,9 @@
+const process = require( "node:process" );
+const fs = require( "fs" );
+const path = require( "path" );
 const axios = require( "axios" );
 const { JSDOM } = require( "jsdom" );
 const { Readability } = require( "@mozilla/readability" );
-const fs = require( "fs" );
-const path = require( "path" );
 const { connect } = require( "puppeteer-real-browser" );
 
 class WebScraper
@@ -334,7 +335,7 @@ class WebScraper
 		{
 			urlPath = urlPath.slice( 0, -1 );
 		}
-		const filePath = path.join( __dirname, this.scrapResultPath, urlPath );
+		const filePath = path.join( process.cwd(), this.scrapResultPath, urlPath );
 		const dir = path.dirname( filePath );
 
 		fs.mkdirSync( dir, { recursive: true });
@@ -347,14 +348,14 @@ class WebScraper
 
 	createJSONLFile ()
 	{
-		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPath ) );
+		const writeStreamSimple = fs.createWriteStream( path.join( process.cwd(), this.jsonlOutputPath ) );
 		writeStreamSimple.on( "error", err =>
 		{ return console.error( "Error writing JSONL:", err ) });
 
 		let writeStreamMeta;
 		if ( this.includeMetadata )
 		{
-			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.jsonlOutputPathWithMeta ) );
+			writeStreamMeta = fs.createWriteStream( path.join( process.cwd(), this.jsonlOutputPathWithMeta ) );
 			writeStreamMeta.on( "error", ( err ) => { return console.error( "Error writing metadata JSONL:", err ) });
 		}
 		for ( const content of this.allProcessedContent )
@@ -377,7 +378,7 @@ class WebScraper
 	createCSVFile ()
 	{
 		// Create simple version
-		const writeStreamSimple = fs.createWriteStream( path.join( __dirname, this.csvOutputPath ) );
+		const writeStreamSimple = fs.createWriteStream( path.join( process.cwd(), this.csvOutputPath ) );
 		writeStreamSimple.on( "error", ( err ) => { return console.error( "Error writing CSV:", err ) });
 		writeStreamSimple.write( "text\n" );
 
@@ -385,7 +386,7 @@ class WebScraper
 		let writeStreamMeta;
 		if ( this.includeMetadata )
 		{
-			writeStreamMeta = fs.createWriteStream( path.join( __dirname, this.csvOutputPathWithMeta ) );
+			writeStreamMeta = fs.createWriteStream( path.join( process.cwd(), this.csvOutputPathWithMeta ) );
 			writeStreamMeta.on( "error", ( err ) => { return console.error( "Error writing metadata CSV:", err ) });
 		}
 
@@ -427,12 +428,12 @@ class WebScraper
 
 	saveNumberedTextFiles ()
 	{
-		const baseTextPath = path.join( __dirname, this.textOutputPath );
+		const baseTextPath = path.join( process.cwd(), this.textOutputPath );
 
 		let metaTextPath = null;
 		if ( this.includeMetadata )
 		{
-			metaTextPath = path.join( __dirname, this.textOutputPathWithMeta );
+			metaTextPath = path.join( process.cwd(), this.textOutputPathWithMeta );
 			fs.mkdirSync( metaTextPath, { recursive: true });
 		}
 
@@ -672,13 +673,13 @@ class WebScraper
 	createOutputDirectory ()
 	{
 		const paths = [
-			path.join( __dirname, this.scrapResultPath ),
-			path.join( __dirname, this.textOutputPath ),
-			path.join( __dirname, this.textOutputPathWithMeta ),
-			path.join( __dirname, this.csvOutputPath ),
-			path.join( __dirname, this.csvOutputPathWithMeta ),
-			path.join( __dirname, this.jsonlOutputPath ),
-			path.join( __dirname, this.jsonlOutputPathWithMeta )
+			path.join( process.cwd(), this.scrapResultPath ),
+			path.join( process.cwd(), this.textOutputPath ),
+			path.join( process.cwd(), this.textOutputPathWithMeta ),
+			path.join( process.cwd(), this.csvOutputPath ),
+			path.join( process.cwd(), this.csvOutputPathWithMeta ),
+			path.join( process.cwd(), this.jsonlOutputPath ),
+			path.join( process.cwd(), this.jsonlOutputPathWithMeta )
 		];
 		for ( const p of paths )
 		{
@@ -688,9 +689,9 @@ class WebScraper
 			}
 		}
 		// Recreate directories needed for output
-		this.ensureDirectory( path.join( __dirname, this.scrapResultPath ) );
-		this.ensureDirectory( path.join( __dirname, this.textOutputPath ) );
-		this.ensureDirectory( path.join( __dirname, this.textOutputPathWithMeta ) );
+		this.ensureDirectory( path.join( process.cwd(), this.scrapResultPath ) );
+		this.ensureDirectory( path.join( process.cwd(), this.textOutputPath ) );
+		this.ensureDirectory( path.join( process.cwd(), this.textOutputPathWithMeta ) );
 	}
 
 	ensureDirectory ( dirPath )
@@ -709,7 +710,7 @@ class WebScraper
 	static async combineResults ( outputPath, websites )
 	{
 		await WebScraper.sleep( 1000 );
-		const fullOutputPath = path.join( __dirname, outputPath );
+		const fullOutputPath = path.join( process.cwd(), outputPath );
 		WebScraper.createCombinedDirectories( fullOutputPath );
 		WebScraper.combineJSONLFiles( fullOutputPath, websites );
 		WebScraper.combineCSVFiles( fullOutputPath, websites );
@@ -743,7 +744,7 @@ class WebScraper
 		for ( const website of websites )
 		{
 			const jsonlContent = fs.readFileSync(
-				path.join( __dirname, website.jsonlOutputPath ),
+				path.join( process.cwd(), website.jsonlOutputPath ),
 				"utf-8"
 			);
 			if ( jsonlContent )
@@ -753,7 +754,7 @@ class WebScraper
 			if ( website.includeMetadata )
 			{
 				const jsonlMetaContent = fs.readFileSync(
-					path.join( __dirname, website.jsonlOutputPathWithMeta ),
+					path.join( process.cwd(), website.jsonlOutputPathWithMeta ),
 					"utf-8"
 				);
 				if ( jsonlMetaContent )
@@ -782,7 +783,7 @@ class WebScraper
 
 		for ( const website of websites )
 		{
-			const csvContent = fs.readFileSync( path.join( __dirname, website.csvOutputPath ), "utf-8" )
+			const csvContent = fs.readFileSync( path.join( process.cwd(), website.csvOutputPath ), "utf-8" )
 			.split( "\n" )
 			.slice( 1 )
 			.filter( line => { return line.trim() });
@@ -794,7 +795,7 @@ class WebScraper
 			{
 				const csvMetaContent = fs
 				.readFileSync(
-					path.join( __dirname, website.csvOutputPathWithMeta ),
+					path.join( process.cwd(), website.csvOutputPathWithMeta ),
 					"utf-8"
 				)
 				.split( "\n" )
@@ -815,11 +816,11 @@ class WebScraper
 		let textFileCounter = 1;
 		for ( const website of websites )
 		{
-			const textFiles = fs.readdirSync( path.join( __dirname, website.textOutputPath ) );
+			const textFiles = fs.readdirSync( path.join( process.cwd(), website.textOutputPath ) );
 			for ( const file of textFiles )
 			{
 				const content = fs.readFileSync(
-					path.join( __dirname, website.textOutputPath, file ),
+					path.join( process.cwd(), website.textOutputPath, file ),
 					"utf-8"
 				);
 				fs.writeFileSync(
@@ -830,7 +831,7 @@ class WebScraper
 				if ( website.includeMetadata )
 				{
 					const metaContent = fs.readFileSync(
-						path.join( __dirname, website.textOutputPathWithMeta, file ),
+						path.join( process.cwd(), website.textOutputPathWithMeta, file ),
 						"utf-8"
 					);
 					fs.writeFileSync(
