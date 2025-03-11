@@ -50,6 +50,7 @@ async function khameneiIrFreePalestineTag ( enable )
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 		maxDepth: 1,
+		maxArticles: 2,
 		exactExcludeList: [
 			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100"
@@ -72,6 +73,7 @@ async function khameneiIrPalestineSpecialPage ( enable )
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/palestine-special-page",
 		maxDepth: 2,
+		maxArticles: 2,
 		exactExcludeList: [
 			"https://english.khamenei.ir/palestine-special-page/"
 		],
@@ -101,6 +103,7 @@ async function decolonizepalestine ( enable )
 			"https://decolonizepalestine.com/rainbow-washing",
 			"https://decolonizepalestine.com/"
 		],
+		maxArticles: 2,
 		scrapResultPath: "./dataset/decolonizepalestine/website",
 		jsonlOutputPath: "./dataset/decolonizepalestine/train.jsonl",
 		textOutputPath: "./dataset/decolonizepalestine/texts",
@@ -307,7 +310,7 @@ async function palestineremembered ( enable )
 void async function main ()
 {
 	// const palianswersScraper = await palianswers( true );
-	// const decolonizepalestineScraper = await decolonizepalestine( true );
+	const decolonizepalestineScraper = await decolonizepalestine( true );
 	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
 	// const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( true );
 	// const electronicintifadaScraper = await electronicintifada( true );
@@ -316,13 +319,13 @@ void async function main ()
 	// const bdsmovementScraper = await bdsmovement( false );
 	// const palestinerememberedScraper = await palestineremembered( false );
 
-	// await WebScraper.combineResults( "./dataset/combined", [
-	// 	palianswersScraper,
-	// 	decolonizepalestineScraper,
-	// 	khameneiIrFreePalestineTagScraper,
-	// 	khameneiIrPalestineSpecialPageScraper,
-	// 	electronicintifadaScraper,
-	// 	standWithPalestineScraper,
-	// 	mondoweisScraper
-	// ] );
+	await WebScraper.combineResults( "./dataset/combined", [
+		// palianswersScraper,
+		decolonizepalestineScraper,
+		khameneiIrFreePalestineTagScraper,
+		// khameneiIrPalestineSpecialPageScraper,
+		// electronicintifadaScraper,
+		// standWithPalestineScraper,
+		// mondoweisScraper
+	] );
 }();

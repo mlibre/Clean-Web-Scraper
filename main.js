@@ -335,7 +335,7 @@ class WebScraper
 		{
 			urlPath = urlPath.slice( 0, -1 );
 		}
-		const filePath = path.join( process.cwd(), this.scrapResultPath, urlPath );
+		const filePath = path.join( this.scrapResultPath, urlPath );
 		const dir = path.dirname( filePath );
 
 		fs.mkdirSync( dir, { recursive: true });
@@ -348,7 +348,7 @@ class WebScraper
 
 	createJSONLFile ()
 	{
-		const writeStreamSimple = fs.createWriteStream( path.join( process.cwd(), this.jsonlOutputPath ) );
+		const writeStreamSimple = fs.createWriteStream( this.jsonlOutputPath );
 		writeStreamSimple.on( "error", err =>
 		{ return console.error( "Error writing JSONL:", err ) });
 
@@ -428,7 +428,7 @@ class WebScraper
 
 	saveNumberedTextFiles ()
 	{
-		const baseTextPath = path.join( process.cwd(), this.textOutputPath );
+		const baseTextPath = this.textOutputPath;
 
 		let metaTextPath = null;
 		if ( this.includeMetadata )
@@ -673,13 +673,13 @@ class WebScraper
 	createOutputDirectory ()
 	{
 		const paths = [
-			path.join( process.cwd(), this.scrapResultPath ),
-			path.join( process.cwd(), this.textOutputPath ),
-			path.join( process.cwd(), this.textOutputPathWithMeta ),
-			path.join( process.cwd(), this.csvOutputPath ),
-			path.join( process.cwd(), this.csvOutputPathWithMeta ),
-			path.join( process.cwd(), this.jsonlOutputPath ),
-			path.join( process.cwd(), this.jsonlOutputPathWithMeta )
+			this.scrapResultPath,
+			this.textOutputPath,
+			this.textOutputPathWithMeta,
+			this.csvOutputPath,
+			this.csvOutputPathWithMeta,
+			this.jsonlOutputPath,
+			this.jsonlOutputPathWithMeta
 		];
 		for ( const p of paths )
 		{
@@ -710,7 +710,7 @@ class WebScraper
 	static async combineResults ( outputPath, websites )
 	{
 		await WebScraper.sleep( 1000 );
-		const fullOutputPath = path.join( process.cwd(), outputPath );
+		const fullOutputPath = outputPath;
 		WebScraper.createCombinedDirectories( fullOutputPath );
 		WebScraper.combineJSONLFiles( fullOutputPath, websites );
 		WebScraper.combineCSVFiles( fullOutputPath, websites );
@@ -743,20 +743,16 @@ class WebScraper
 
 		for ( const website of websites )
 		{
-			const jsonlContent = fs.readFileSync(
-				path.join( process.cwd(), website.jsonlOutputPath ),
-				"utf-8"
-			);
+			const jsonlContent = fs.readFileSync( website.jsonlOutputPath, "utf-8" );
+
 			if ( jsonlContent )
 			{
 				jsonlOutput.write( jsonlContent );
 			}
 			if ( website.includeMetadata )
 			{
-				const jsonlMetaContent = fs.readFileSync(
-					path.join( process.cwd(), website.jsonlOutputPathWithMeta ),
-					"utf-8"
-				);
+				const jsonlMetaContent = fs.readFileSync( website.jsonlOutputPathWithMeta, "utf-8" );
+
 				if ( jsonlMetaContent )
 				{
 					jsonlMetaOutput.write( jsonlMetaContent );
@@ -783,7 +779,7 @@ class WebScraper
 
 		for ( const website of websites )
 		{
-			const csvContent = fs.readFileSync( path.join( process.cwd(), website.csvOutputPath ), "utf-8" )
+			const csvContent = fs.readFileSync( website.csvOutputPath, "utf-8" )
 			.split( "\n" )
 			.slice( 1 )
 			.filter( line => { return line.trim() });
@@ -793,11 +789,8 @@ class WebScraper
 			}
 			if ( website.includeMetadata )
 			{
-				const csvMetaContent = fs
-				.readFileSync(
-					path.join( process.cwd(), website.csvOutputPathWithMeta ),
-					"utf-8"
-				)
+				const csvMetaContent = fs.readFileSync( website.csvOutputPathWithMeta, "utf-8" )
+
 				.split( "\n" )
 				.slice( 1 )
 				.filter( line => { return line.trim() });
@@ -819,10 +812,8 @@ class WebScraper
 			const textFiles = fs.readdirSync( path.join( process.cwd(), website.textOutputPath ) );
 			for ( const file of textFiles )
 			{
-				const content = fs.readFileSync(
-					path.join( process.cwd(), website.textOutputPath, file ),
-					"utf-8"
-				);
+				const content = fs.readFileSync( path.join( website.textOutputPath, file ), "utf-8" );
+
 				fs.writeFileSync(
 					path.join( fullOutputPath, "texts", `${textFileCounter}.txt` ),
 					content,
@@ -830,10 +821,7 @@ class WebScraper
 				);
 				if ( website.includeMetadata )
 				{
-					const metaContent = fs.readFileSync(
-						path.join( process.cwd(), website.textOutputPathWithMeta, file ),
-						"utf-8"
-					);
+					const metaContent = fs.readFileSync( path.join( website.textOutputPathWithMeta, file ), "utf-8" );
 					fs.writeFileSync(
 						path.join(
 							fullOutputPath,
