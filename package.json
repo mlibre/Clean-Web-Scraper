@@ -1,6 +1,6 @@
 {
   "name": "clean-web-scraper",
-  "version": "4.2.2",
+  "version": "4.2.3",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
@@ -24,7 +24,7 @@
   "description": "",
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.3",
     "eslint": "^9.17.0",
     "jsdom": "^26.0.0",
     "puppeteer": "^24.1.1",
