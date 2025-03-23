@@ -261,7 +261,9 @@ async function bdsmovement ( enable )
 			"https://bdsmovement.net/contact-us",
 			"https://bdsmovement.net/taxonomy",
 			"https://bdsmovement.net/news-type",
-			"https://bdsmovement.net/cdn-cgi"
+			"https://bdsmovement.net/cdn-cgi",
+			"https://bdsmovement.net/es/",
+			"https://bdsmovement.net/ar/"
 		],
 		exactExcludeList: [
 			"https://bdsmovement.net/",
