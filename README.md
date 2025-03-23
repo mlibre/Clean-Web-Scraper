@@ -17,7 +17,7 @@ A powerful Node.js web scraper that extracts clean, readable content from websit
 
 ## 🛠️ Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js (v20 or higher)
 - npm
 
 ## 📦 Dependencies
@@ -39,7 +39,7 @@ sudo pacman -S extra/xorg-server-xvfb chromium
 npm install
 
 # Skip chromium download during npm installation
-# npm i --ignore-scripts
+# npm install --ignore-scripts
 ```
 
 ## 💻 Usage
@@ -62,6 +62,7 @@ const scraper = new WebScraper({
   maxArticles: Infinity,                        // Optional: Maximum articles to scrape
   crawlingDelay: 1000,                          // Optional: Delay between requests (ms)
   batchSize: 5,                                 // Optional: Number of URLs to process concurrently
+  minContentLength: 400,                        // Optional: Minimum content length to consider valid
 
   // Network options
   axiosHeaders: {},                             // Optional: Custom HTTP headers
@@ -91,7 +92,7 @@ const docsScraper = new WebScraper({
   scrapResultPath: './datasets/docs',
   maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
   includeMetadata: true,                     // Optional: Include metadata in output files
-  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate"],
+  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
    // Optional: Specify metadata fields to include
 });
 
@@ -114,8 +115,7 @@ await WebScraper.combineResults('./combined', [docsScraper, blogScraper]);
 ```
 
 ```bash
-# 8 GB RAM
-node --max-old-space-size=8192 example-usage.js
+node example-usage.js
 ```
 
 ## 📤 Output
@@ -132,9 +132,11 @@ example.com/
 ├── website/
 │   ├── page1.txt         # Clean text content
 │   ├── page1.json        # Full metadata
+│   ├── page1.html                # Original HTML content
 │   └── blog/
 │       ├── post1.txt
 │       └── post1.json
+│       └── post1.html
 ├── texts/                # Numbered text files
 │   ├── 1.txt
 │   └── 2.txt
@@ -174,9 +176,10 @@ The actual article content starts here. This is the clean, processed text of the
 ```text
 articleTitle: Palestine history
 description: This is a great article about Palestine history
-author: John Doe
+author: Rawan
 language: en
 dateScraped: 2024-01-20T10:30:00Z
+url: https://palianswers.com
 
 ---
 
@@ -201,10 +204,18 @@ The actual article content starts here. This is the clean, processed text of the
 
 ```json
 {
-  "url": "<https://example.com/page>",
-  "title": "Page Title",
+  "url": "https://example.com/page",
+  "pageTitle": "Page Title",
   "description": "Page description",
-  "dateScraped": "2024-01-20T10:30:00Z"
+  "language": "en",
+  "canonicalUrl": "https://example.com/canonical",
+  "ogTitle": "Open Graph Title",
+  "ogDescription": "Open Graph Description",
+  "ogImage": "https://example.com/image.jpg",
+  "ogType": "article",
+  "dataScrapedDate": "2024-01-20T10:30:00Z",
+  "originalHtml": "<html>...</html>",
+  "articleTitle": "Article Title",
 }
 ```
 

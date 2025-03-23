@@ -282,7 +282,16 @@ async function bdsmovement ( enable )
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
 		maxArticles: 2000,
 		maxDepth: 16,
-		batchSize: 20
+		batchSize: 40,
+		axiosHeaders: headers,
+		axiosMaxRetries: 2,
+		axiosRetryDelay: 8000,
+		axiosProxy: {
+			host: "localhost",
+			port: 2080,
+			protocol: "http"
+		},
+		useProxyAsFallback: true
 	};
 	return await runScraper( config, enable );
 }
