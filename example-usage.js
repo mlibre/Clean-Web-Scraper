@@ -273,6 +273,7 @@ async function bdsmovement ( enable )
 			/^https:\/\/bdsmovement\.net\/resources\?type=\d+$/,
 			/^https:\/\/bdsmovement\.net\/news\?type=\d+$/,
 			/^https:\/\/bdsmovement\.net\/news\?campaign=\d+$/,
+			/^https:\/\/bdsmovement\.net\/news\?location=\d+$/,
 		],
 		scrapResultPath: "./dataset/bdsmovement/website",
 		jsonlOutputPath: "./dataset/bdsmovement/train.jsonl",
