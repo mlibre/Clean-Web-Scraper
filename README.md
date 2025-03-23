@@ -120,7 +120,7 @@ node example-usage.js
 
 ## 📤 Output
 
-T content is saved in a clean, structured format:
+The content is saved in a clean, structured format:
 
 - 📁 Base folder: `./folderPath/example.com/`
 - 📑 Files preserve original URL paths
