@@ -134,9 +134,11 @@ async function electronicintifada ( enable )
 			"https://electronicintifada.net/review",
 			"https://electronicintifada.net/artmusicculture",
 			"https://electronicintifada.net/blog/editors",
-			"https://electronicintifada.net/blog"
 		],
 		exactExcludeList: [
+			"https://electronicintifada.net/blog",
+			/^https:\/\/electronicintifada\.net\/blog\/.*/,
+			/^https:\/\/electronicintifada\.net\/blog\?page=\d+$/,
 			"https://electronicintifada.net",
 			"https://electronicintifada.net/blogs",
 			"https://electronicintifada.net/review",
@@ -149,10 +151,10 @@ async function electronicintifada ( enable )
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
 		maxArticles: 2000,
 		maxDepth: 16,
-		batchSize: 30,
+		batchSize: 40,
 		axiosHeaders: headers,
-		axiosMaxRetries: 3,
-		axiosRetryDelay: 10000,
+		axiosMaxRetries: 2,
+		axiosRetryDelay: 8000,
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
@@ -230,7 +232,7 @@ async function mondoweiss ( enable )
 		maxDepth: 15,
 		batchSize: 20,
 		axiosHeaders: headers,
-		axiosMaxRetries: 3,
+		axiosMaxRetries: 2,
 		axiosRetryDelay: 10000,
 		axiosProxy: {
 			host: "localhost",
