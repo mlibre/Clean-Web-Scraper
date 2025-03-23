@@ -120,7 +120,7 @@ node example-usage.js
 
 ## 📤 Output
 
-Your AI-ready content is saved in a clean, structured format:
+T content is saved in a clean, structured format:
 
 - 📁 Base folder: `./folderPath/example.com/`
 - 📑 Files preserve original URL paths
@@ -130,36 +130,36 @@ Your AI-ready content is saved in a clean, structured format:
 ```bash
 example.com/
 ├── website/
-│   ├── page1.txt         # Clean text content
-│   ├── page1.json        # Full metadata
-│   ├── page1.html                # Original HTML content
+│   ├── page1.txt             # Clean text content
+│   ├── page1.json            # Full metadata
+│   ├── page1.html            # Original HTML content
 │   └── blog/
 │       ├── post1.txt
 │       └── post1.json
 │       └── post1.html
-├── texts/                # Numbered text files
+├── texts/                    # Numbered text files
 │   ├── 1.txt
 │   └── 2.txt
-├── texts_with_metadata/  # When includeMetadata is true
+├── texts_with_metadata/      # When includeMetadata is true
 │   ├── 1.txt
 │   └── 2.txt
-├── train.jsonl           # Combined content
-├── train_with_metadata.jsonl  # When includeMetadata is true
-├── train.csv             # Clean text in CSV format
-└── train_with_metadata.csv    # When includeMetadata is true
+├── train.jsonl               # Combined content
+├── train_with_metadata.jsonl # When includeMetadata is true
+├── train.csv                 # Clean text in CSV format
+└── train_with_metadata.csv   # When includeMetadata is true
 
 combined/
-├── texts/                # Combined numbered text files
+├── texts/                    # Combined numbered text files
 │   ├── 1.txt
 │   ├── 2.txt
 │   └── n.txt
-├── texts_with_metadata/  # Combined metadata text files
+├── texts_with_metadata/      # Combined metadata text files
 │   ├── 1.txt
 │   ├── 2.txt
 │   └── n.txt
-├── combined.jsonl        # Combined JSONL content
+├── combined.jsonl            # Combined JSONL content
 ├── combined_with_metadata.jsonl
-├── combined.csv         # Combined CSV content
+├── combined.csv              # Combined CSV content
 └── combined_with_metadata.csv
 ```
 
@@ -200,7 +200,7 @@ The actual article content starts here. This is the clean, processed text of the
 {"text": "Another article", "metadata": {"articleTitle": "Second Page", "author": "Jane Smith"}}
 ```
 
-### 🗃️ JSON Files In Website Output  (*.json)
+### 🗃️ JSON Files In Website Directory  (*.json)
 
 ```json
 {
