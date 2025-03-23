@@ -470,7 +470,7 @@ class WebScraper
 		let processed = content;
 		// Remove unwanted fixed text
 		processed = processed.replace( /\[You can read more about this here\]/g, "" ).trim();
-		// Trim each line and remove extra newlines
+		processed = processed.replace( /Click on the image to view the large size/g, "" );
 		processed = processed
 		.split( "\n" )
 		.map( line => { return line.trim() })

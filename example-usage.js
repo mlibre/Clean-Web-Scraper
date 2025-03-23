@@ -122,7 +122,6 @@ async function electronicintifada ( enable )
 			"https://electronicintifada.net/updates",
 			"https://electronicintifada.net/taxonomy/term/",
 			"https://electronicintifada.net/tags/",
-			"https://electronicintifada.net/blog",
 			"https://electronicintifada.net/people",
 			"https://electronicintifada.net/location",
 			"https://electronicintifada.net/file",
@@ -133,11 +132,13 @@ async function electronicintifada ( enable )
 			"https://electronicintifada.net/opinion",
 			"https://electronicintifada.net/about-ei",
 			"https://electronicintifada.net/review",
-			"https://electronicintifada.net/artmusicculture"
+			"https://electronicintifada.net/artmusicculture",
+			"https://electronicintifada.net/blog/editors",
+			"https://electronicintifada.net/blog"
 		],
 		exactExcludeList: [
 			"https://electronicintifada.net",
-			"https://electronicintifada.net/blog",
+			"https://electronicintifada.net/blogs",
 			"https://electronicintifada.net/review",
 		],
 		scrapResultPath: "./dataset/electronicintifada/website",
@@ -146,10 +147,11 @@ async function electronicintifada ( enable )
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
-		maxDepth: 16,
 		maxArticles: 2000,
+		maxDepth: 16,
+		batchSize: 30,
 		axiosHeaders: headers,
-		axiosMaxRetries: 2,
+		axiosMaxRetries: 3,
 		axiosRetryDelay: 10000,
 		axiosProxy: {
 			host: "localhost",
@@ -209,20 +211,24 @@ async function mondoweiss ( enable )
 			"https://mondoweiss.net/activism/",
 			"https://mondoweiss.net/news-letters/",
 			"https://mondoweiss.net/newsletters",
-			/^https:\/\/mondoweiss\.net\/\d{4}\/\d{2}$/,
-			/^https:\/\/mondoweiss\.net\/\d{4}\/$/,
 			"https://mondoweiss.net/daily-headlines",
 			"https://mondoweiss.net/palestineletter",
 			"https://mondoweiss.net/podcasts/",
 			"https://mondoweiss.net/the-shift",
-			"https://mondoweiss.net/weekly-briefing"
+			"https://mondoweiss.net/weekly-briefing",
+			"https://mondoweiss.net/contact/",
+			/^https:\/\/mondoweiss\.net\/\d{4}\/\d{2}\/?$/,
+			/^https:\/\/mondoweiss\.net\/\d{4}\/?$/
 		],
 		scrapResultPath: "./dataset/mondoweiss/website",
 		jsonlOutputPath: "./dataset/mondoweiss/train.jsonl",
 		textOutputPath: "./dataset/mondoweiss/texts",
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
+		includeMetadata: true,
+		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
 		maxArticles: 2500,
 		maxDepth: 15,
+		batchSize: 20,
 		axiosHeaders: headers,
 		axiosMaxRetries: 3,
 		axiosRetryDelay: 10000,
@@ -232,9 +238,6 @@ async function mondoweiss ( enable )
 			protocol: "http"
 		},
 		useProxyAsFallback: true,
-		includeMetadata: true,
-		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
-		batchSize: 20
 	};
 	return await runScraper( config, enable );
 }
@@ -253,17 +256,21 @@ async function bdsmovement ( enable )
 			"https://bdsmovement.net/admin",
 			"https://bdsmovement.net/stay-updated",
 			"https://bdsmovement.net/join-a-bds-campaign",
-			"https://bdsmovement.net/contact-us"
+			"https://bdsmovement.net/contact-us",
+			"https://bdsmovement.net/taxonomy",
+			"https://bdsmovement.net/news-type",
+			"https://bdsmovement.net/cdn-cgi"
 		],
 		exactExcludeList: [
 			"https://bdsmovement.net/",
 			"https://bdsmovement.net/shutdownnation",
 			"https://bdsmovement.net/campaigns",
+			"https://bdsmovement.net/resources",
 			/^https:\/\/bdsmovement\.net\/resources\?page=\d+$/,
 			/^https:\/\/bdsmovement\.net\/resources\?campaign=\d+$/,
 			/^https:\/\/bdsmovement\.net\/resources\?type=\d+$/,
 			/^https:\/\/bdsmovement\.net\/news\?type=\d+$/,
-			/^https:\/\/bdsmovement\.net\/news\?campaign=\d+$/
+			/^https:\/\/bdsmovement\.net\/news\?campaign=\d+$/,
 		],
 		scrapResultPath: "./dataset/bdsmovement/website",
 		jsonlOutputPath: "./dataset/bdsmovement/train.jsonl",
@@ -271,8 +278,9 @@ async function bdsmovement ( enable )
 		csvOutputPath: "./dataset/bdsmovement/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
-		maxDepth: 16,
 		maxArticles: 2000,
+		maxDepth: 16,
+		batchSize: 20
 	};
 	return await runScraper( config, enable );
 }
@@ -307,6 +315,7 @@ async function palestineremembered ( enable )
 		csvOutputPath: "./dataset/palestineremembered/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
+		batchSize: 10,
 		axiosProxy: {
 			host: "localhost",
 			port: 2080,
@@ -318,24 +327,24 @@ async function palestineremembered ( enable )
 
 void async function main ()
 {
-	// const palianswersScraper = await palianswers( true );
-	// const decolonizepalestineScraper = await decolonizepalestine( true );
-	// const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
+	const palianswersScraper = await palianswers( true );
+	const decolonizepalestineScraper = await decolonizepalestine( true );
+	const khameneiIrFreePalestineTagScraper = await khameneiIrFreePalestineTag( true );
 	const khameneiIrPalestineSpecialPageScraper = await khameneiIrPalestineSpecialPage( true );
-	// const electronicintifadaScraper = await electronicintifada( true );
-	// const standWithPalestineScraper = await standWithPalestine( true );
-	// const mondoweisScraper = await mondoweiss( true );
-	// const bdsmovementScraper = await bdsmovement( true );
+	const electronicintifadaScraper = await electronicintifada( true );
+	const standWithPalestineScraper = await standWithPalestine( true );
+	const mondoweisScraper = await mondoweiss( true );
+	const bdsmovementScraper = await bdsmovement( true );
 	// const palestinerememberedScraper = await palestineremembered( false );
 
-	// await WebScraper.combineResults( "./dataset/combined", [
-	// palianswersScraper,
-	// decolonizepalestineScraper,
-	// khameneiIrFreePalestineTagScraper,
-	// khameneiIrPalestineSpecialPageScraper,
-	// electronicintifadaScraper,
-	// standWithPalestineScraper,
-	// mondoweisScraper,
-	// bdsmovementScraper,
-	// ] );
+	await WebScraper.combineResults( "./dataset/combined", [
+		palianswersScraper,
+		decolonizepalestineScraper,
+		khameneiIrFreePalestineTagScraper,
+		khameneiIrPalestineSpecialPageScraper,
+		electronicintifadaScraper,
+		standWithPalestineScraper,
+		mondoweisScraper,
+		bdsmovementScraper,
+	] );
 }();
