@@ -18,6 +18,7 @@ class WebScraper
 		this.maxArticles = config.maxArticles || Infinity;
 		this.crawlingDelay = config.crawlingDelay ?? 1000;
 		this.batchSize = config.batchSize || 5;
+		this.minContentLength = config.minContentLength || 400;
 
 		// Output paths setup
 		this.scrapResultPath = config.scrapResultPath || "./dataset";
@@ -525,7 +526,7 @@ class WebScraper
 			ogDescription: document.querySelector( "meta[property=\"og:description\"]" )?.content,
 			ogImage: document.querySelector( "meta[property=\"og:image\"]" )?.content,
 			ogType: document.querySelector( "meta[property=\"og:type\"]" )?.content,
-			dateScrapedDate: new Date().toISOString(),
+			dataScrapedDate: new Date().toISOString(),
 			originalHtml: html,
 		};
 	}
@@ -663,7 +664,7 @@ class WebScraper
 
 		const hasInvalidPhrases = invalidPhrases.some( phrase => { return cleanContent.includes( phrase ) });
 		// Check content length
-		if ( cleanContent.length < 100 || hasInvalidPhrases )
+		if ( cleanContent.length < this.minContentLength || hasInvalidPhrases )
 		{
 			return false;
 		}

@@ -91,7 +91,7 @@ const docsScraper = new WebScraper({
   scrapResultPath: './datasets/docs',
   maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
   includeMetadata: true,                     // Optional: Include metadata in output files
-  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
+  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate"],
    // Optional: Specify metadata fields to include
 });
 
@@ -101,7 +101,7 @@ const blogScraper = new WebScraper({
   scrapResultPath: './datasets/blog',
   maxDepth: 3,                               // Optional: Maximum depth for recursive crawling
   includeMetadata: true,                     // Optional: Include metadata in output files
-  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dateScrapedDate"],
+  metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate"],
    // Optional: Specify metadata fields to include
 });
 
