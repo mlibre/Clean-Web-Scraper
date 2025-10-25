@@ -49,7 +49,7 @@ async function khameneiIrFreePalestineTag ( enable )
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 		maxDepth: 1,
-		maxArticles: 200,
+		maxArticles: 300,
 		exactExcludeList: [
 			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100#",
 			"https://english.khamenei.ir/page/search.xhtml?topicid=0&period=0&q=FreePalestine&pageSize=100"
@@ -72,7 +72,7 @@ async function khameneiIrPalestineSpecialPage ( enable )
 		baseURL: "https://english.khamenei.ir/news",
 		startURL: "https://english.khamenei.ir/palestine-special-page",
 		maxDepth: 1,
-		maxArticles: 200,
+		maxArticles: 300,
 		exactExcludeList: [
 			"https://english.khamenei.ir/palestine-special-page/"
 		],
@@ -102,7 +102,7 @@ async function decolonizepalestine ( enable )
 			"https://decolonizepalestine.com/rainbow-washing",
 			"https://decolonizepalestine.com/"
 		],
-		maxArticles: 400,
+		maxArticles: 500,
 		scrapResultPath: "./dataset/decolonizepalestine/website",
 		jsonlOutputPath: "./dataset/decolonizepalestine/train.jsonl",
 		textOutputPath: "./dataset/decolonizepalestine/texts",
@@ -149,18 +149,18 @@ async function electronicintifada ( enable )
 		csvOutputPath: "./dataset/electronicintifada/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
-		maxArticles: 2000,
+		maxArticles: 3000,
 		maxDepth: 16,
 		batchSize: 40,
 		axiosHeaders: headers,
 		axiosMaxRetries: 2,
 		axiosRetryDelay: 8000,
-		axiosProxy: {
-			host: "localhost",
-			port: 2080,
-			protocol: "http"
-		},
-		useProxyAsFallback: true,
+		// axiosProxy: {
+		// 	host: "localhost",
+		// 	port: 10808,
+		// 	protocol: "socks5"
+		// },
+		// useProxyAsFallback: true,
 	};
 	return await runScraper( config, enable );
 }
@@ -228,18 +228,18 @@ async function mondoweiss ( enable )
 		csvOutputPath: "./dataset/mondoweiss/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
-		maxArticles: 2500,
+		maxArticles: 3000,
 		maxDepth: 15,
 		batchSize: 20,
 		axiosHeaders: headers,
 		axiosMaxRetries: 2,
 		axiosRetryDelay: 10000,
-		axiosProxy: {
-			host: "localhost",
-			port: 2080,
-			protocol: "http"
-		},
-		useProxyAsFallback: true,
+		// axiosProxy: {
+		// 	host: "localhost",
+		// 	port: 10808,
+		// 	protocol: "socks5"
+		// },
+		// useProxyAsFallback: true,
 	};
 	return await runScraper( config, enable );
 }
@@ -285,18 +285,18 @@ async function bdsmovement ( enable )
 		csvOutputPath: "./dataset/bdsmovement/train.csv",
 		includeMetadata: true,
 		metadataFields: ["author", "articleTitle", "pageTitle", "description", "dataScrapedDate", "url"],
-		maxArticles: 2000,
+		maxArticles: 3000,
 		maxDepth: 16,
 		batchSize: 100,
 		axiosHeaders: headers,
 		axiosMaxRetries: 2,
 		axiosRetryDelay: 8000,
-		axiosProxy: {
-			host: "localhost",
-			port: 2080,
-			protocol: "http"
-		},
-		useProxyAsFallback: true
+		// axiosProxy: {
+		// 	host: "localhost",
+		// 	port: 10808,
+		// 	protocol: "socks5"
+		// },
+		// useProxyAsFallback: true
 	};
 	return await runScraper( config, enable );
 }
@@ -334,8 +334,8 @@ async function palestineremembered ( enable )
 		batchSize: 10,
 		axiosProxy: {
 			host: "localhost",
-			port: 2080,
-			protocol: "http"
+			port: 10808,
+			protocol: "socks5"
 		}
 	};
 	return await runScraper( config, enable );

@@ -555,7 +555,6 @@ class WebScraper
 						proxy: this.axiosProxy
 					};
 				}
-
 				return await axios.get( url, options );
 			}
 			catch ( error )
